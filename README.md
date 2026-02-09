@@ -27,9 +27,7 @@ A Matrix-style "digital rain" screensaver generator for macOS. Creates the iconi
 ## Installation
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/matrix-screensaver.git
-cd matrix-screensaver
+# Clone this repository and cd into it
 
 # Install dependencies
 bun install
