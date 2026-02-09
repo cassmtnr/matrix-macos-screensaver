@@ -1,570 +1,238 @@
-# Matrix Digital Rain - macOS Screensaver
+# Matrix Digital Rain - Project Overhaul Specification
 
-Build a Matrix-style "digital rain" screensaver for macOS from scratch.
-
----
-
-## ⛔ CRITICAL: NO SPACES IN PRODUCT_NAME
-
-**PRODUCT_NAME must be `MatrixDigitalRain` - NEVER use spaces.**
-
-```
-❌ WRONG:  PRODUCT_NAME = "Matrix Digital Rain";   // BREAKS THE SCREENSAVER
-❌ WRONG:  PRODUCT_NAME = Matrix Digital Rain;     // BREAKS THE SCREENSAVER
-✅ CORRECT: PRODUCT_NAME = MatrixDigitalRain;       // THIS IS THE ONLY VALID FORMAT
-```
-
-Spaces in PRODUCT_NAME create a module name with underscores (`Matrix_Digital_Rain`), which breaks class lookup and causes the screensaver to show a black screen or crash.
+Complete overhaul of the Matrix Digital Rain macOS screensaver to bring it to open-source production quality: minimalistic, functional, zero loose ends.
 
 ---
 
-## Project Overview
+## Project Identity
 
-Create a native macOS screensaver (.saver bundle) that renders the iconic falling green characters effect from The Matrix movie. The screensaver must render in real-time using Core Graphics (no video files).
+- **Name**: Matrix Digital Rain
+- **Type**: Native macOS screensaver (.saver bundle)
+- **Language**: 100% Swift
+- **Rendering**: Real-time Core Graphics + Core Text (no video files)
+- **Target**: macOS 11.0 (Big Sur) and later
+- **License**: MIT
+- **Repository**: https://github.com/cassmtnr/matrix-macos-screensaver
+- **GitHub Pages**: https://cassmtnr.github.io/matrix-macos-screensaver/
+- **Support**: https://buymeacoffee.com/cassmtnr
 
-### Key Requirements
+---
 
-- **100% Swift** - Native macOS screensaver using ScreenSaverView
-- **Real-time rendering** - Use Core Graphics/Core Text, no pre-rendered video
-- **Lightweight** - Final bundle should be < 500KB
-- **Compatible** - macOS 11.0 (Big Sur) and later
-- **Both install modes work** - "Install for This User Only" AND "Install for All Users"
-
-## Part 1: Xcode Project Setup
-
-### Create Screen Saver Project
-
-1. Create a new Xcode project using the **Screen Saver** template:
-   - Product Name: `MatrixDigitalRain` (**NO SPACES** - this becomes the Swift module name)
-   - Bundle Identifier: `com.cassmtnr.matrixdigitalrain`
-   - Language: Swift
-   - Deployment Target: macOS 11.0
-
-2. The template creates a `MatrixDigitalRainView.swift` file - this is the main screensaver view.
-
-### Naming Requirements Checklist
-
-| Setting | Value | Notes |
-|---------|-------|-------|
-| PRODUCT_NAME | `MatrixDigitalRain` | **NO SPACES, NO QUOTES** |
-| NSPrincipalClass | `MatrixDigitalRainView` | Simple class name |
-| @objc annotation | `@objc(MatrixDigitalRainView)` | On the main view class |
-| Bundle Identifier | `com.cassmtnr.matrixdigitalrain` | Lowercase, dots only |
-
-**The main view class MUST include the @objc annotation:**
-```swift
-@objc(MatrixDigitalRainView)
-class MatrixDigitalRainView: ScreenSaverView {
-```
-
-This exposes the class to Objective-C runtime with a predictable name that matches NSPrincipalClass.
-
-### Project Structure
+## CRITICAL CONSTRAINT: NO SPACES IN PRODUCT_NAME
 
 ```
-MatrixDigitalRain/
-├── MatrixDigitalRain.xcodeproj/
-├── MatrixDigitalRain/
-│   ├── MatrixConfig.swift       # Configuration constants
-│   ├── MatrixColumn.swift       # Falling column logic
-│   ├── MatrixDigitalRainView.swift  # Main screensaver view (from template)
-│   └── Info.plist               # Bundle metadata
-├── MatrixDigitalRainTests/      # Unit tests
-│   ├── MatrixColumnTests.swift
-│   └── MatrixConfigTests.swift
-├── docs/                        # GitHub Pages website
-├── .github/workflows/           # CI/CD
-├── README.md
-└── PROMPT.md
+PRODUCT_NAME = MatrixDigitalRain;       // CORRECT - the ONLY valid format
+PRODUCT_NAME = "Matrix Digital Rain";   // WRONG - breaks the screensaver
 ```
 
-## Part 2: Swift Implementation
+Spaces in PRODUCT_NAME create a Swift module name with underscores (`Matrix_Digital_Rain`), which breaks Objective-C class lookup and causes black screen or crash. **Verify after EVERY change to the Xcode project.**
 
-### MatrixConfig.swift
+---
 
-Configuration constants for the Matrix effect:
+## Phase 1: Asset Recovery
 
-```swift
-import Foundation
-import AppKit
+### Recover `matrix_preview.gif` from Git History
 
-struct MatrixConfig {
-    static let fontSize: CGFloat = 18
-    static let columnWidth: CGFloat = 18
-    static let charChangeProb: Double = 0.02
-    static let hue: CGFloat = 120  // Matrix green (degrees)
-    static let fps: Double = 30
-    static let minTrailLength: Int = 10
-    static let maxTrailLength: Int = 31
-    static let minSpeed: Double = 0.3
-    static let maxSpeed: Double = 1.0
+The preview GIF was deleted during the Swift rewrite but still exists in git history. Recover it:
 
-    // Character set: Katakana, Latin, Cyrillic, Korean, Greek, digits, symbols
-    static let matrixChars: [Character] = Array(
-        "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン" +
-        "ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ" +
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
-        "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ" +
-        "가나다라마바사아자차카타파하" +
-        "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ" +
-        "0123456789" +
-        ":<>*+=-@#$%&[?]{!}"
-    )
-
-    static func randomChar() -> Character {
-        matrixChars[Int.random(in: 0..<matrixChars.count)]
-    }
-}
+```bash
+git show 0e0ef17:matrix_preview.gif > docs/matrix_preview.gif
 ```
 
-### MatrixColumn.swift
+This ~4MB GIF is needed by:
+- `README.md` - `![Matrix Rain Preview](docs/matrix_preview.gif)`
+- `docs/index.html` - OpenGraph/Twitter Card image meta tags reference it
+- GitHub Pages landing page - currently shows a `[ MATRIX RAIN PREVIEW ]` placeholder div
 
-Represents a single falling column of characters:
+### Update `docs/index.html` Preview Section
 
-```swift
-import Foundation
+Replace the placeholder div with the actual preview image:
 
-class MatrixColumn {
-    let columnIndex: Int
-    private let numRows: Int
-    private var chars: [Character]
-    private var headY: Double
-    private var speed: Double
-    private var trailLength: Int
+```html
+<!-- REPLACE THIS: -->
+<div class="preview-placeholder">
+    [ MATRIX RAIN PREVIEW ]
+</div>
 
-    init(columnIndex: Int, numRows: Int) {
-        self.columnIndex = columnIndex
-        self.numRows = numRows
-        self.chars = (0..<numRows).map { _ in MatrixConfig.randomChar() }
-        self.headY = Double.random(in: Double(-numRows)...0)
-        self.speed = Double.random(in: MatrixConfig.minSpeed..<MatrixConfig.maxSpeed)
-        self.trailLength = Int.random(in: MatrixConfig.minTrailLength..<MatrixConfig.maxTrailLength)
-    }
-
-    func update() {
-        headY += speed
-
-        // Reset when off screen
-        if headY - Double(trailLength) > Double(numRows) {
-            headY = Double.random(in: Double(-trailLength * 2)..<Double(-trailLength))
-            speed = Double.random(in: MatrixConfig.minSpeed..<MatrixConfig.maxSpeed)
-            trailLength = Int.random(in: MatrixConfig.minTrailLength..<MatrixConfig.maxTrailLength)
-        }
-
-        // Randomly mutate characters (glitch effect)
-        for i in 0..<chars.count {
-            if Double.random(in: 0..<1) < MatrixConfig.charChangeProb {
-                chars[i] = MatrixConfig.randomChar()
-            }
-        }
-    }
-
-    func getBrightness(row: Int) -> Double {
-        let distanceFromHead = headY - Double(row)
-        if distanceFromHead < 0 || distanceFromHead > Double(trailLength) {
-            return 0.0
-        }
-        if distanceFromHead < 1 {
-            return 1.0  // Head is brightest (white)
-        }
-        return max(0, 1.0 - distanceFromHead / Double(trailLength))
-    }
-
-    func getChar(row: Int) -> Character {
-        chars[row % chars.count]
-    }
-}
+<!-- WITH THIS: -->
+<img src="matrix_preview.gif" alt="Matrix Digital Rain screensaver preview showing falling green characters on black background" loading="lazy">
 ```
 
-### MatrixDigitalRainView.swift
+---
 
-Main screensaver view - replace the template content:
+## Phase 2: Dead Code & Loose Ends Audit
 
-```swift
-import ScreenSaver
+### Files to Inspect
 
-@objc(MatrixDigitalRainView)
-class MatrixDigitalRainView: ScreenSaverView {
-    private var columns: [MatrixColumn] = []
-    private var numColumns: Int = 0
-    private var numRows: Int = 0
-    private var matrixFont: NSFont!
+| File | Check For |
+|------|-----------|
+| `MatrixDigitalRainView.swift` | Empty `stopAnimation()` override - remove if it only calls `super` with no custom cleanup |
+| `MatrixColumn.swift` | Verify staged changes (headY initialization for thumbnail preview) are correct and committed |
+| `MatrixConfig.swift` | Ensure no unused config values exist |
+| `Info.plist` | Copyright year should say 2025+ or just "MIT License" |
+| `.gitignore` | Clean up - remove entries for tools not used (e.g., `.idea/`, `.vscode/` if not needed) |
+| `project.pbxproj` | No stale file references, no old build settings |
+| `docs/index.html` | Remove the `.preview-placeholder` CSS class after replacing with `<img>` |
 
-    override init?(frame: NSRect, isPreview: Bool) {
-        super.init(frame: frame, isPreview: isPreview)
-        setup()
-    }
+### Consistency Checks
 
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        setup()
-    }
+1. **README.md vs actual project** - Ensure README accurately reflects the current Swift project (not the old Node.js/TypeScript version)
+2. **PROMPT.md vs actual files** - This spec should describe desired state, not duplicate source code
+3. **CI workflows vs build output** - Both `ci.yml` and `release.yml` must use `MatrixDigitalRain.saver` (no spaces). The actual workflow files are already correct but verify
+4. **No orphaned files** - Check for `default.profraw`, build artifacts, or temp files that shouldn't be tracked
 
-    private func setup() {
-        animationTimeInterval = 1.0 / MatrixConfig.fps
-        matrixFont = NSFont.monospacedSystemFont(ofSize: MatrixConfig.fontSize, weight: .medium)
-    }
+### Remove `default.profraw`
 
-    private func initializeColumns() {
-        guard bounds.width > 0 && bounds.height > 0 else { return }
-        numColumns = max(1, Int(bounds.width / MatrixConfig.columnWidth))
-        numRows = max(1, Int(bounds.height / MatrixConfig.fontSize) + 5)
-        columns = (0..<numColumns).map { MatrixColumn(columnIndex: $0, numRows: numRows) }
-    }
+If `default.profraw` exists in the working directory, add it to `.gitignore` and remove it from tracking:
 
-    override func startAnimation() {
-        super.startAnimation()
-        if columns.isEmpty { initializeColumns() }
-    }
-
-    override func stopAnimation() {
-        super.stopAnimation()
-    }
-
-    override func animateOneFrame() {
-        if columns.isEmpty && bounds.width > 0 { initializeColumns() }
-        for column in columns { column.update() }
-        needsDisplay = true
-    }
-
-    override func draw(_ rect: NSRect) {
-        // Black background
-        NSColor.black.setFill()
-        bounds.fill()
-
-        guard !columns.isEmpty else { return }
-
-        for column in columns {
-            let x = CGFloat(column.columnIndex) * MatrixConfig.columnWidth
-
-            for row in 0..<numRows {
-                let brightness = column.getBrightness(row: row)
-                guard brightness > 0 else { continue }
-
-                let char = column.getChar(row: row)
-                let y = bounds.height - CGFloat(row + 1) * MatrixConfig.fontSize
-
-                let color: NSColor = brightness >= 0.95
-                    ? .white
-                    : NSColor(hue: MatrixConfig.hue / 360.0, saturation: 0.85, brightness: CGFloat(brightness), alpha: 1.0)
-
-                let attributes: [NSAttributedString.Key: Any] = [.font: matrixFont!, .foregroundColor: color]
-                String(char).draw(at: NSPoint(x: x, y: y), withAttributes: attributes)
-            }
-        }
-    }
-
-    override var hasConfigureSheet: Bool { false }
-    override var configureSheet: NSWindow? { nil }
-}
+```bash
+echo "default.profraw" >> .gitignore
+git rm --cached default.profraw 2>/dev/null
 ```
 
-### Info.plist Requirements
-
-Ensure Info.plist contains:
-
-- `NSPrincipalClass`: `MatrixDigitalRainView` (simple class name - NOT module-qualified, because the class uses `@objc(MatrixDigitalRainView)`)
-- `CFBundleIdentifier`: `com.cassmtnr.matrixdigitalrain`
-- `LSMinimumSystemVersion`: `11.0`
-
-## Part 3: Unit Tests
-
-### MatrixColumnTests.swift
-
-```swift
-import XCTest
-@testable import MatrixDigitalRain
-
-final class MatrixColumnTests: XCTestCase {
-    func testInitialization() {
-        let column = MatrixColumn(columnIndex: 5, numRows: 60)
-        XCTAssertEqual(column.columnIndex, 5)
-    }
-
-    func testBrightnessAtHead() {
-        let column = MatrixColumn(columnIndex: 0, numRows: 60)
-        // After many updates, head should be visible somewhere
-        for _ in 0..<100 { column.update() }
-        // At least one row should have brightness > 0
-        let hasBrightness = (0..<60).contains { column.getBrightness(row: $0) > 0 }
-        XCTAssertTrue(hasBrightness)
-    }
-
-    func testCharacterRetrieval() {
-        let column = MatrixColumn(columnIndex: 0, numRows: 60)
-        let char = column.getChar(row: 0)
-        XCTAssertTrue(MatrixConfig.matrixChars.contains(char))
-    }
-
-    func testUpdateDoesNotCrash() {
-        let column = MatrixColumn(columnIndex: 0, numRows: 60)
-        for _ in 0..<1000 { column.update() }
-    }
-}
-```
-
-### MatrixConfigTests.swift
-
-```swift
-import XCTest
-@testable import MatrixDigitalRain
-
-final class MatrixConfigTests: XCTestCase {
-    func testRandomCharReturnsValidCharacter() {
-        for _ in 0..<100 {
-            let char = MatrixConfig.randomChar()
-            XCTAssertTrue(MatrixConfig.matrixChars.contains(char))
-        }
-    }
-
-    func testCharacterSetNotEmpty() {
-        XCTAssertFalse(MatrixConfig.matrixChars.isEmpty)
-        XCTAssertGreaterThan(MatrixConfig.matrixChars.count, 100)
-    }
-
-    func testConfigValues() {
-        XCTAssertEqual(MatrixConfig.fontSize, 18)
-        XCTAssertEqual(MatrixConfig.fps, 30)
-        XCTAssertEqual(MatrixConfig.hue, 120)
-        XCTAssertLessThan(MatrixConfig.minSpeed, MatrixConfig.maxSpeed)
-        XCTAssertLessThan(MatrixConfig.minTrailLength, MatrixConfig.maxTrailLength)
-    }
-}
-```
-
-## Part 4: GitHub Actions CI/CD
-
-### .github/workflows/ci.yml
-
-```yaml
-name: CI
-
-on:
-  push:
-    branches: [main, develop]
-  pull_request:
-    branches: [main]
-
-jobs:
-  build-and-test:
-    name: Build and Test
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
-
-      - name: Build
-        run: |
-          xcodebuild -project MatrixDigitalRain.xcodeproj \
-            -scheme MatrixDigitalRain \
-            -configuration Release \
-            -derivedDataPath build \
-            build
-
-      - name: Run Tests
-        run: |
-          xcodebuild -project MatrixDigitalRain.xcodeproj \
-            -scheme MatrixDigitalRain \
-            -configuration Debug \
-            -derivedDataPath build \
-            test
-
-      - name: Package artifact
-        run: |
-          mkdir -p artifact
-          cp -R "build/Build/Products/Release/Matrix Digital Rain.saver" artifact/
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: MatrixDigitalRain.saver
-          path: artifact/
-```
+---
+
+## Phase 3: Test Coverage Improvement
 
-### .github/workflows/release.yml
+### Current State
 
-```yaml
-name: Release
+Only 2 test files exist:
+- `MatrixColumnTests.swift` - 4 tests (initialization, brightness, character retrieval, update stability)
+- `MatrixConfigTests.swift` - 3 tests (random char, character set, config values)
 
-on:
-  release:
-    types: [created]
+### Missing Coverage
 
-jobs:
-  build-and-upload:
-    name: Build and Upload Release
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
+**MatrixColumn** needs additional tests:
+- `getBrightness()` returns 0.0 for rows outside the trail
+- `getBrightness()` returns 1.0 for the head position (distanceFromHead < 1)
+- `getBrightness()` returns decreasing values along the trail (fade effect)
+- `getChar()` handles modulo wraparound for row indices > numRows
+- `update()` resets column when head moves past the screen
+- `update()` mutates characters probabilistically (run many iterations, verify chars changed)
+- Speed and trail length are within configured bounds after initialization
+- Speed and trail length are within configured bounds after reset
 
-      - name: Select Xcode
-        run: sudo xcode-select -s /Applications/Xcode.app
+**MatrixConfig** needs additional tests:
+- `matrixChars` contains characters from all expected scripts (katakana, latin, cyrillic, korean, greek, digits, symbols)
+- `columnWidth` equals `fontSize` (current design assumes 1:1 ratio)
+- All config values are positive / within valid ranges
+- `charChangeProb` is between 0 and 1
+- `hue` is a valid degree value (0-360)
+- `fps` is reasonable (> 0, <= 120)
 
-      - name: Build
-        run: |
-          xcodebuild -project MatrixDigitalRain.xcodeproj \
-            -scheme MatrixDigitalRain \
-            -configuration Release \
-            -derivedDataPath build \
-            build
+**MatrixDigitalRainView** - Create `MatrixDigitalRainViewTests.swift`:
+- NOTE: ScreenSaverView tests require careful setup since the view depends on AppKit. Test what's testable:
+  - `hasConfigureSheet` returns `false`
+  - `configureSheet` returns `nil`
+  - Initialization with a valid frame succeeds
+  - `animationTimeInterval` is set to `1.0 / MatrixConfig.fps` after setup
+  - `animateOneFrame()` initializes columns when bounds are valid and columns are empty
+  - `draw()` doesn't crash with empty columns
+  - `draw()` doesn't crash with initialized columns
+  - Column count matches expected value based on frame width and `MatrixConfig.columnWidth`
+  - Row count matches expected value based on frame height and `MatrixConfig.fontSize` (plus buffer)
 
-      - name: Create zip
-        run: |
-          cd "build/Build/Products/Release"
-          zip -r "MatrixDigitalRain.saver.zip" "Matrix Digital Rain.saver"
-          mv "MatrixDigitalRain.saver.zip" "$GITHUB_WORKSPACE/"
+### Test Quality Standards
 
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: MatrixDigitalRain.saver.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-```
+- Every test should have a clear name describing the behavior being tested
+- Use `@testable import MatrixDigitalRain` in all test files
+- No flaky tests - avoid assertions that depend on random state being a specific value
+- Test boundary conditions (0 rows, 1 row, very large values)
+- Tests must pass in CI (GitHub Actions `macos-latest`)
 
-## Part 5: README.md
+---
 
-Create a comprehensive README with:
+## Phase 4: Code Quality Polish
 
-```markdown
-# Matrix Digital Rain Screensaver
-
-[![CI](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform: macOS](https://img.shields.io/badge/Platform-macOS_11+-blue.svg)](https://www.apple.com/macos/)
-[![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
-
-A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered falling green characters.
-
-![Matrix Rain Preview](docs/matrix_preview.gif)
-
-## Features
-
-- 🎬 **Authentic Matrix effect** - Falling characters with glowing heads and fading trails
-- 🌏 **Multi-script characters** - Japanese katakana, Latin, Cyrillic, Korean, Greek, symbols
-- ⚡ **Real-time rendering** - Core Graphics powered, no video files
-- 📦 **Lightweight** - ~300KB bundle size
-- 🖥️ **Adaptive** - Automatically scales to any screen resolution
-- ♾️ **Infinite duration** - No looping, runs forever
-
-## Installation
-
-### Download (Recommended)
-
-1. Download `MatrixDigitalRain.saver.zip` from [Releases](https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest)
-2. Unzip and double-click `Matrix Digital Rain.saver`
-3. Choose **Install for This User Only** or **Install for All Users**
-4. Open **System Settings** → **Screen Saver** and select **Matrix Digital Rain**
-
-### Build from Source
-
-\`\`\`bash
-git clone https://github.com/cassmtnr/matrix-macos-screensaver.git
-cd matrix-macos-screensaver
-
-xcodebuild -project MatrixDigitalRain.xcodeproj \
- -scheme MatrixDigitalRain \
- -configuration Release \
- -derivedDataPath build \
- build
-
-# Install
-
-open "build/Build/Products/Release/Matrix Digital Rain.saver"
-\`\`\`
-
-## Requirements
-
-- macOS 11.0 (Big Sur) or later
-
-## Support
-
-If you enjoy this screensaver, consider [buying me a coffee](https://buymeacoffee.com/cassmtnr) ☕
-
-## License
-
-MIT License - feel free to use, modify, and distribute.
-```
-
-## Part 6: GitHub Pages (docs/)
-
-### docs/index.html
-
-Create a stylish landing page with:
-
-1. **SEO optimization**:
-   - Title: "Matrix Screensaver for macOS - Free Digital Rain Screen Saver"
-   - Meta description targeting: matrix screensaver, macos screensaver, digital rain, free screensaver
-   - Open Graph and Twitter card meta tags
-   - JSON-LD structured data (SoftwareApplication schema)
-   - Canonical URL
-
-2. **Design**:
-   - Black background with Matrix green (#00ff41) accents
-   - Monospace font (JetBrains Mono)
-   - Animated Matrix rain effect in background (canvas-based JavaScript)
-   - CRT scanline overlay effect
-
-3. **Content sections**:
-   - Header with "MATRIX" title and "screensaver // macOS" tagline
-   - Preview GIF
-   - Download button linking to GitHub releases
-   - Installation steps
-   - Features grid
-   - "Buy me a coffee" support link
-   - Footer with GitHub link and MIT license
-
-4. **Additional files**:
-   - `docs/robots.txt` - Allow all crawlers
-   - `docs/sitemap.xml` - Include main page URL
-   - `docs/matrix_preview.gif` - Animated preview (create/capture separately)
-
-### SEO JSON-LD Schema
-
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  "name": "Matrix Screensaver",
-  "operatingSystem": "macOS",
-  "applicationCategory": "UtilitiesApplication",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-  "description": "Free Matrix-style digital rain screensaver for macOS",
-  "downloadUrl": "https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest",
-  "fileSize": "300KB",
-  "softwareRequirements": "macOS 11.0 or later"
-}
-```
-
-## Part 7: Additional Files
-
-### .gitignore
-
-```
-# macOS
-.DS_Store
-
-# Xcode
-build/
-DerivedData/
-*.xcuserstate
-xcuserdata/
-
-# Built bundles
-*.saver
-
-# IDE
-.idea/
-.vscode/
-```
-
-### LICENSE
-
-MIT License (standard template)
-
-## Build & Test Commands
+### Swift Best Practices
+
+- Use `final` on classes that won't be subclassed (`MatrixColumn`)
+- Use `private(set)` where external read access is needed but writes should be internal
+- Consider making `MatrixColumn` a struct if reference semantics aren't required (the array of columns in the view would still work with value types since they're in a `var` array)
+- Ensure all force-unwraps (`!`) are justified or replaced with safe alternatives (e.g., `matrixFont!` in the view's `draw()`)
+- Use `[Character]` initializer efficiently - verify the character string concatenation doesn't create unnecessary intermediate strings
+
+### Performance Considerations
+
+- The `draw()` method creates `NSAttributedString` attributes dictionary on every frame for every character. Consider caching attribute dictionaries per brightness level
+- The character mutation loop in `update()` iterates every character every frame. This is fine for the current scale but document why
+
+### Architecture
+
+The current 3-file architecture is already minimal and clean:
+- `MatrixConfig.swift` - Pure data, no dependencies
+- `MatrixColumn.swift` - Logic layer, depends only on MatrixConfig
+- `MatrixDigitalRainView.swift` - Presentation layer, depends on both
+
+**Do NOT over-engineer.** This is a screensaver, not a framework. No protocols, no dependency injection, no abstractions beyond what exists. Keep it simple.
+
+---
+
+## Phase 5: README & Documentation
+
+### README.md Requirements
+
+The README should be concise and scannable. Include:
+
+1. **Badges**: CI status, License (MIT), Platform (macOS 11+), Swift version
+2. **One-line description**: What it is
+3. **Preview GIF**: `![Matrix Rain Preview](docs/matrix_preview.gif)` - must render on GitHub
+4. **Features list**: Brief, no emojis (minimalistic open-source style)
+5. **Installation**:
+   - Download from Releases (recommended path)
+   - Build from source (developer path)
+6. **Requirements**: macOS 11.0+
+7. **Development**: Project structure, build/test commands
+8. **Contributing**: Brief section welcoming contributions (it's open source)
+9. **License**: MIT
+
+### Things to Remove from README
+
+- Emojis in feature list (keep it clean and professional)
+- References to old Node.js/TypeScript project structure
+- "Buy me a coffee" link - keep it only on the GitHub Pages site, not the README (optional, up to taste)
+
+---
+
+## Phase 6: GitHub Pages Site
+
+### Current State
+
+`docs/index.html` is a well-designed Matrix-themed landing page with:
+- SEO optimization (OpenGraph, Twitter Card, JSON-LD, sitemap, robots.txt)
+- Animated matrix rain background (canvas JavaScript)
+- CRT scanline overlay effect
+
+### Required Changes
+
+1. **Add preview GIF** - Replace placeholder div with actual `<img>` tag (see Phase 1)
+2. **Remove unused CSS** - Delete `.preview-placeholder` styles after replacing with `<img>`
+3. **Verify all links work** - Download button, GitHub link, Buy Me a Coffee link
+4. **Update version info** if needed in the download section
+5. **Verify `sitemap.xml` lastmod date** is recent
+
+---
+
+## Phase 7: CI/CD Verification
+
+### Verify Workflows Match Reality
+
+Both workflows should already be correct (fixed in commit `4c620d6`), but verify:
+
+**ci.yml** must:
+- Trigger on push to main/develop and PRs to main
+- Build Release configuration
+- Run tests in Debug configuration
+- Package `MatrixDigitalRain.saver` (NO spaces)
+- Upload artifact
+
+**release.yml** must:
+- Trigger on release creation
+- Build Release configuration
+- Zip `MatrixDigitalRain.saver` (NO spaces)
+- Upload zip to GitHub release
+
+### Test Locally Before Pushing
 
 ```bash
 # Build Release
@@ -578,6 +246,7 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
 xcodebuild -project MatrixDigitalRain.xcodeproj \
   -scheme MatrixDigitalRain \
   -configuration Debug \
+  -derivedDataPath build \
   test
 
 # Clean
@@ -585,68 +254,93 @@ xcodebuild -project MatrixDigitalRain.xcodeproj clean
 rm -rf build/
 ```
 
-## Links
-
-- **GitHub Repository**: https://github.com/cassmtnr/matrix-macos-screensaver
-- **GitHub Pages**: https://cassmtnr.github.io/matrix-macos-screensaver/
-- **Buy Me a Coffee**: https://buymeacoffee.com/cassmtnr
-
-## Success Criteria
-
-1. ✅ Screensaver builds without errors
-2. ✅ Works with "Install for This User Only"
-3. ✅ Works with "Install for All Users"
-4. ✅ Thumbnail preview works in System Settings
-5. ✅ Full screensaver animation works
-6. ✅ All unit tests pass
-7. ✅ CI pipeline passes
-8. ✅ GitHub Pages site is live and SEO-optimized
-9. ✅ Release workflow creates downloadable zip
-
 ---
 
-## ⚠️ Verification Checklist (MUST RUN BEFORE COMPLETION)
+## Verification Checklist
 
-**Do NOT just restore files from git. Always verify the following:**
+Run ALL of these before marking the overhaul complete:
 
-### 1. PRODUCT_NAME Check
+### 1. PRODUCT_NAME (Critical)
 ```bash
 grep "PRODUCT_NAME" MatrixDigitalRain.xcodeproj/project.pbxproj
 ```
-**Expected output:** `PRODUCT_NAME = MatrixDigitalRain;` (NO spaces, NO quotes around value)
+Expected: `PRODUCT_NAME = MatrixDigitalRain;` - NO spaces, NO quotes
 
-If you see `"Matrix Digital Rain"` or any spaces, FIX IT IMMEDIATELY.
-
-### 2. NSPrincipalClass Check
+### 2. NSPrincipalClass
 ```bash
 grep -A1 "NSPrincipalClass" MatrixDigitalRain/Info.plist
 ```
-**Expected output:** `<string>MatrixDigitalRainView</string>`
+Expected: `<string>MatrixDigitalRainView</string>`
 
-### 3. @objc Annotation Check
+### 3. @objc Annotation
 ```bash
 grep "@objc" MatrixDigitalRain/MatrixDigitalRainView.swift
 ```
-**Expected output:** `@objc(MatrixDigitalRainView)`
+Expected: `@objc(MatrixDigitalRainView)`
 
-### 4. Build and Verify Module Name
+### 4. Preview GIF Exists
 ```bash
-xcodebuild -scheme MatrixDigitalRain -configuration Release build
-nm build/Build/Products/Release/*.saver/Contents/MacOS/* | grep "OBJC_CLASS.*MatrixDigitalRainView"
+ls -la docs/matrix_preview.gif
 ```
-**Expected output:** `_OBJC_CLASS_$_MatrixDigitalRainView` (no underscores in class name except the prefix)
+Expected: File exists, ~4MB
 
-### 5. Clean Old Builds
-Remove any old builds with spaces in the name:
+### 5. No Placeholder in HTML
 ```bash
-rm -rf "build/Build/Products/Release/Matrix Digital Rain.saver"*
-rm -rf "build/Build/Products/Debug/Matrix Digital Rain.saver"*
+grep "preview-placeholder" docs/index.html
 ```
+Expected: No matches (placeholder replaced with actual image)
 
-### 6. Run Tests
+### 6. All Tests Pass
 ```bash
-xcodebuild -scheme MatrixDigitalRain test
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Debug \
+  -derivedDataPath build \
+  test
 ```
-All tests must pass.
+Expected: All tests pass, including new coverage tests
 
-**Only mark the task complete after ALL verifications pass.**
+### 7. No Dead Files
+```bash
+# Should NOT exist:
+ls default.profraw 2>/dev/null && echo "REMOVE THIS"
+```
+
+### 8. Build Succeeds
+```bash
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Release \
+  -derivedDataPath build \
+  build
+```
+
+### 9. Git Status Clean
+```bash
+git status
+```
+All changes should be intentional and committed.
+
+---
+
+## Success Criteria
+
+- [ ] `matrix_preview.gif` recovered and in `docs/`
+- [ ] `docs/index.html` shows actual preview image, no placeholder
+- [ ] No dead code, no empty overrides, no unused CSS
+- [ ] Test coverage expanded: MatrixColumn, MatrixConfig, and MatrixDigitalRainView all tested
+- [ ] All tests pass locally
+- [ ] README is clean, professional, and accurate
+- [ ] CI/CD workflows are correct (no space-in-filename bugs)
+- [ ] `.gitignore` is clean, no tracked artifacts
+- [ ] Build succeeds in Release mode
+- [ ] PRODUCT_NAME verified: `MatrixDigitalRain` with no spaces
+- [ ] Code follows Swift best practices (final classes, safe unwrapping, etc.)
+
+---
+
+## Links
+
+- **Repository**: https://github.com/cassmtnr/matrix-macos-screensaver
+- **GitHub Pages**: https://cassmtnr.github.io/matrix-macos-screensaver/
+- **Buy Me a Coffee**: https://buymeacoffee.com/cassmtnr

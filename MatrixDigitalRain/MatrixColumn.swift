@@ -1,20 +1,22 @@
 import Foundation
 
-class MatrixColumn {
+final class MatrixColumn {
     let columnIndex: Int
     private let numRows: Int
     private var chars: [Character]
-    private var headY: Double
-    private var speed: Double
-    private var trailLength: Int
+    private(set) var headY: Double
+    private(set) var speed: Double
+    private(set) var trailLength: Int
 
     init(columnIndex: Int, numRows: Int) {
         self.columnIndex = columnIndex
         self.numRows = numRows
         self.chars = (0..<numRows).map { _ in MatrixConfig.randomChar() }
-        self.headY = Double.random(in: Double(-numRows)...0)
-        self.speed = Double.random(in: MatrixConfig.minSpeed..<MatrixConfig.maxSpeed)
-        self.trailLength = Int.random(in: MatrixConfig.minTrailLength..<MatrixConfig.maxTrailLength)
+        // Start columns at random positions across the screen so content is visible immediately
+        // This ensures the thumbnail preview shows the matrix effect, not a black screen
+        self.headY = Double.random(in: 0..<Double(numRows))
+        self.speed = Double.random(in: MatrixConfig.minSpeed...MatrixConfig.maxSpeed)
+        self.trailLength = Int.random(in: MatrixConfig.minTrailLength...MatrixConfig.maxTrailLength)
     }
 
     func update() {

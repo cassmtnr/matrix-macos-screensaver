@@ -34,10 +34,6 @@ class MatrixDigitalRainView: ScreenSaverView {
         if columns.isEmpty { initializeColumns() }
     }
 
-    override func stopAnimation() {
-        super.stopAnimation()
-    }
-
     override func animateOneFrame() {
         if columns.isEmpty && bounds.width > 0 { initializeColumns() }
         for column in columns { column.update() }
@@ -49,7 +45,7 @@ class MatrixDigitalRainView: ScreenSaverView {
         NSColor.black.setFill()
         bounds.fill()
 
-        guard !columns.isEmpty else { return }
+        guard !columns.isEmpty, let font = matrixFont else { return }
 
         for column in columns {
             let x = CGFloat(column.columnIndex) * MatrixConfig.columnWidth
@@ -65,7 +61,7 @@ class MatrixDigitalRainView: ScreenSaverView {
                     ? .white
                     : NSColor(hue: MatrixConfig.hue / 360.0, saturation: 0.85, brightness: CGFloat(brightness), alpha: 1.0)
 
-                let attributes: [NSAttributedString.Key: Any] = [.font: matrixFont!, .foregroundColor: color]
+                let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color]
                 String(char).draw(at: NSPoint(x: x, y: y), withAttributes: attributes)
             }
         }

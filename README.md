@@ -85,9 +85,9 @@ xcodebuild -project MatrixDigitalRain.xcodeproj clean
 rm -rf build/
 ```
 
-## Support
+## Contributing
 
-If you enjoy this screensaver, consider [buying me a coffee](https://buymeacoffee.com/cassmtnr)
+Contributions are welcome. Please open an issue or submit a pull request.
 
 ## License
 
