@@ -30,20 +30,24 @@ Create a native macOS screensaver (.saver bundle) that renders the iconic fallin
 
 **The screensaver will NOT work if naming is inconsistent.** Follow these rules exactly:
 
-1. **PRODUCT_NAME in Xcode**: Must be `MatrixDigitalRain` (no spaces)
-   - This determines the Swift module name
-   - Spaces get converted to underscores, breaking class lookup
+1. **PRODUCT_NAME in Xcode Build Settings**: Must be exactly `MatrixDigitalRain`
+   - ❌ WRONG: `"Matrix Digital Rain"` (has spaces)
+   - ✅ CORRECT: `MatrixDigitalRain` (no spaces, no quotes needed)
+   - Spaces get converted to underscores in the Swift module name, breaking class lookup
+   - In project.pbxproj, it should appear as: `PRODUCT_NAME = MatrixDigitalRain;`
 
-2. **NSPrincipalClass in Info.plist**: Must be `MatrixDigitalRainView`
-   - Use the simple class name (not module-qualified)
-   - The view class MUST have `@objc(MatrixDigitalRainView)` annotation
+2. **NSPrincipalClass in Info.plist**: Must be exactly `MatrixDigitalRainView`
+   - This is the simple class name, not module-qualified
+   - Works because the view class uses `@objc(MatrixDigitalRainView)` annotation
 
 3. **The main view class MUST include the @objc annotation**:
    ```swift
    @objc(MatrixDigitalRainView)
    class MatrixDigitalRainView: ScreenSaverView {
    ```
-   This exposes the class to Objective-C runtime with a predictable name.
+   This exposes the class to Objective-C runtime with a predictable name that matches NSPrincipalClass.
+
+4. **Output bundle name**: The .saver file can still be named "Matrix Digital Rain.saver" for display purposes by setting `PRODUCT_NAME` for the bundle display separately if needed, but the module name must be `MatrixDigitalRain`.
 
 ### Project Structure
 
