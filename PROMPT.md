@@ -19,12 +19,31 @@ Create a native macOS screensaver (.saver bundle) that renders the iconic fallin
 ### Create Screen Saver Project
 
 1. Create a new Xcode project using the **Screen Saver** template:
-   - Product Name: `MatrixDigitalRain`
+   - Product Name: `MatrixDigitalRain` (NO SPACES - this becomes the Swift module name)
    - Bundle Identifier: `com.cassmtnr.matrixdigitalrain`
    - Language: Swift
    - Deployment Target: macOS 11.0
 
 2. The template creates a `MatrixDigitalRainView.swift` file - this is the main screensaver view.
+
+### ⚠️ CRITICAL: Naming Requirements
+
+**The screensaver will NOT work if naming is inconsistent.** Follow these rules exactly:
+
+1. **PRODUCT_NAME in Xcode**: Must be `MatrixDigitalRain` (no spaces)
+   - This determines the Swift module name
+   - Spaces get converted to underscores, breaking class lookup
+
+2. **NSPrincipalClass in Info.plist**: Must be `MatrixDigitalRainView`
+   - Use the simple class name (not module-qualified)
+   - The view class MUST have `@objc(MatrixDigitalRainView)` annotation
+
+3. **The main view class MUST include the @objc annotation**:
+   ```swift
+   @objc(MatrixDigitalRainView)
+   class MatrixDigitalRainView: ScreenSaverView {
+   ```
+   This exposes the class to Objective-C runtime with a predictable name.
 
 ### Project Structure
 
@@ -150,6 +169,7 @@ Main screensaver view - replace the template content:
 ```swift
 import ScreenSaver
 
+@objc(MatrixDigitalRainView)
 class MatrixDigitalRainView: ScreenSaverView {
     private var columns: [MatrixColumn] = []
     private var numColumns: Int = 0
@@ -229,9 +249,9 @@ class MatrixDigitalRainView: ScreenSaverView {
 
 Ensure Info.plist contains:
 
-- `NSPrincipalClass`: The screensaver view class name
+- `NSPrincipalClass`: `MatrixDigitalRainView` (simple class name - NOT module-qualified, because the class uses `@objc(MatrixDigitalRainView)`)
 - `CFBundleIdentifier`: `com.cassmtnr.matrixdigitalrain`
-- `MinimumOSVersion`: `11.0`
+- `LSMinimumSystemVersion`: `11.0`
 
 ## Part 3: Unit Tests
 
