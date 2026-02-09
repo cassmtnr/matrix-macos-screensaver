@@ -228,6 +228,7 @@ class MatrixDigitalRainView: ScreenSaverView {
 ### Info.plist Requirements
 
 Ensure Info.plist contains:
+
 - `NSPrincipalClass`: The screensaver view class name
 - `CFBundleIdentifier`: `com.cassmtnr.matrixdigitalrain`
 - `MinimumOSVersion`: `11.0`
@@ -430,12 +431,13 @@ git clone https://github.com/cassmtnr/matrix-macos-screensaver.git
 cd matrix-macos-screensaver
 
 xcodebuild -project MatrixDigitalRain.xcodeproj \
-  -scheme MatrixDigitalRain \
-  -configuration Release \
-  -derivedDataPath build \
-  build
+ -scheme MatrixDigitalRain \
+ -configuration Release \
+ -derivedDataPath build \
+ build
 
 # Install
+
 open "build/Build/Products/Release/Matrix Digital Rain.saver"
 \`\`\`
 
