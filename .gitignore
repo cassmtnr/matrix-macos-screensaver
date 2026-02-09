@@ -18,5 +18,8 @@ xcuserdata/
 *.swp
 *.swo
 
+# Profiling artifacts
+default.profraw
+
 # Misc
 .ralph/

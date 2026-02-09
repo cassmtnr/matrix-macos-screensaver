@@ -12,6 +12,8 @@
 		A10000000000000000000003 /* MatrixDigitalRainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* MatrixDigitalRainView.swift */; };
 		A10000000000000000000004 /* MatrixConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000021 /* MatrixConfigTests.swift */; };
 		A10000000000000000000005 /* MatrixColumnTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000022 /* MatrixColumnTests.swift */; };
+		A10000000000000000000008 /* MatrixDigitalRainViewTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000023 /* MatrixDigitalRainViewTests.swift */; };
+		A10000000000000000000009 /* MatrixDigitalRainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* MatrixDigitalRainView.swift */; };
 		A10000000000000000000006 /* MatrixConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* MatrixConfig.swift */; };
 		A10000000000000000000007 /* MatrixColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* MatrixColumn.swift */; };
 /* End PBXBuildFile section */
@@ -33,6 +35,7 @@
 		A10000000000000000000014 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A10000000000000000000021 /* MatrixConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixConfigTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000022 /* MatrixColumnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixColumnTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000023 /* MatrixDigitalRainViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixDigitalRainViewTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000041 /* Matrix Digital Rain.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Matrix Digital Rain.saver"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000051 /* MatrixDigitalRainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MatrixDigitalRainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -80,6 +83,7 @@
 			children = (
 				A10000000000000000000021 /* MatrixConfigTests.swift */,
 				A10000000000000000000022 /* MatrixColumnTests.swift */,
+				A10000000000000000000023 /* MatrixDigitalRainViewTests.swift */,
 			);
 			path = MatrixDigitalRainTests;
 			sourceTree = "<group>";
@@ -203,8 +207,10 @@
 			files = (
 				A10000000000000000000006 /* MatrixConfig.swift in Sources */,
 				A10000000000000000000007 /* MatrixColumn.swift in Sources */,
+				A10000000000000000000009 /* MatrixDigitalRainView.swift in Sources */,
 				A10000000000000000000004 /* MatrixConfigTests.swift in Sources */,
 				A10000000000000000000005 /* MatrixColumnTests.swift in Sources */,
+				A10000000000000000000008 /* MatrixDigitalRainViewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -343,7 +349,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MatrixDigitalRain/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Matrix Digital Rain";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2024. MIT License.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2025. MIT License.";
 				INFOPLIST_KEY_NSPrincipalClass = MatrixDigitalRainView;
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				MARKETING_VERSION = 1.0;
@@ -363,7 +369,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = MatrixDigitalRain/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Matrix Digital Rain";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2024. MIT License.";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright 2025. MIT License.";
 				INFOPLIST_KEY_NSPrincipalClass = MatrixDigitalRainView;
 				INSTALL_PATH = "$(HOME)/Library/Screen Savers";
 				MARKETING_VERSION = 1.0;
