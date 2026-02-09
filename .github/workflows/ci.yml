@@ -35,7 +35,7 @@ jobs:
       - name: Package artifact
         run: |
           mkdir -p artifact
-          cp -R "build/Build/Products/Release/Matrix Digital Rain.saver" artifact/
+          cp -R "build/Build/Products/Release/MatrixDigitalRain.saver" artifact/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
