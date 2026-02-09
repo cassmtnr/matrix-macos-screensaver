@@ -1,0 +1,32 @@
+{
+  "name": "matrix-screensaver",
+  "version": "1.0.0",
+  "author": {
+    "name": "Cassiano Montanari",
+    "email": "cassianomontanari@gmail.com"
+  },
+  "main": "src/index.ts",
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.14",
+    "@types/bun": "latest"
+  },
+  "description": "Matrix Rain Screensaver Generator for macOS",
+  "keywords": [
+    "matrix",
+    "screensaver",
+    "macos"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun --watch src/index.ts",
+    "lint": "biome check src/",
+    "lint:fix": "biome check --write src/",
+    "format": "biome format --write src/",
+    "test": "bun test"
+  },
+  "type": "module",
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.90"
+  }
+}

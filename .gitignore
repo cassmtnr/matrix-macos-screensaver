@@ -1,0 +1,26 @@
+# Node.js / Bun
+node_modules/
+dist/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Xcode build artifacts
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test artifacts
+test_font.png
+
+# Misc
+.ralph/
