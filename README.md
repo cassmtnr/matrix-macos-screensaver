@@ -8,7 +8,7 @@
 
 A Matrix-style "digital rain" screensaver generator for macOS. Creates the iconic falling green characters effect from The Matrix, packaged as a native `.saver` bundle.
 
-![Matrix Rain Effect](https://upload.wikimedia.org/wikipedia/commons/c/cc/Digital_rain_animation_small_letters_shine.gif)
+![Matrix Rain Effect](matrix_preview.gif)
 
 ## Features
 
