@@ -25,7 +25,7 @@ jobs:
       - name: Create zip
         run: |
           cd "build/Build/Products/Release"
-          zip -r "MatrixDigitalRain.saver.zip" "Matrix Digital Rain.saver"
+          zip -r "MatrixDigitalRain.saver.zip" "MatrixDigitalRain.saver"
           mv "MatrixDigitalRain.saver.zip" "$GITHUB_WORKSPACE/"
 
       - name: Upload to Release
