@@ -1,7 +1,7 @@
 # Matrix Screensaver
 
-[![CI](https://github.com/cassianomon/matrix-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassianomon/matrix-screensaver/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/cassianomon/matrix-screensaver/graph/badge.svg)](https://codecov.io/gh/cassianomon/matrix-screensaver)
+[![CI](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/cassmtnr/matrix-macos-screensaver/graph/badge.svg)](https://codecov.io/gh/cassmtnr/matrix-macos-screensaver)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS-blue.svg)](https://www.apple.com/macos/)
 [![Bun](https://img.shields.io/badge/Bun-v1.0+-black.svg)](https://bun.sh)
