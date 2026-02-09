@@ -2,6 +2,22 @@
 
 Build a Matrix-style "digital rain" screensaver for macOS from scratch.
 
+---
+
+## ⛔ CRITICAL: NO SPACES IN PRODUCT_NAME
+
+**PRODUCT_NAME must be `MatrixDigitalRain` - NEVER use spaces.**
+
+```
+❌ WRONG:  PRODUCT_NAME = "Matrix Digital Rain";   // BREAKS THE SCREENSAVER
+❌ WRONG:  PRODUCT_NAME = Matrix Digital Rain;     // BREAKS THE SCREENSAVER
+✅ CORRECT: PRODUCT_NAME = MatrixDigitalRain;       // THIS IS THE ONLY VALID FORMAT
+```
+
+Spaces in PRODUCT_NAME create a module name with underscores (`Matrix_Digital_Rain`), which breaks class lookup and causes the screensaver to show a black screen or crash.
+
+---
+
 ## Project Overview
 
 Create a native macOS screensaver (.saver bundle) that renders the iconic falling green characters effect from The Matrix movie. The screensaver must render in real-time using Core Graphics (no video files).
@@ -19,35 +35,29 @@ Create a native macOS screensaver (.saver bundle) that renders the iconic fallin
 ### Create Screen Saver Project
 
 1. Create a new Xcode project using the **Screen Saver** template:
-   - Product Name: `MatrixDigitalRain` (NO SPACES - this becomes the Swift module name)
+   - Product Name: `MatrixDigitalRain` (**NO SPACES** - this becomes the Swift module name)
    - Bundle Identifier: `com.cassmtnr.matrixdigitalrain`
    - Language: Swift
    - Deployment Target: macOS 11.0
 
 2. The template creates a `MatrixDigitalRainView.swift` file - this is the main screensaver view.
 
-### ⚠️ CRITICAL: Naming Requirements
+### Naming Requirements Checklist
 
-**The screensaver will NOT work if naming is inconsistent.** Follow these rules exactly:
+| Setting | Value | Notes |
+|---------|-------|-------|
+| PRODUCT_NAME | `MatrixDigitalRain` | **NO SPACES, NO QUOTES** |
+| NSPrincipalClass | `MatrixDigitalRainView` | Simple class name |
+| @objc annotation | `@objc(MatrixDigitalRainView)` | On the main view class |
+| Bundle Identifier | `com.cassmtnr.matrixdigitalrain` | Lowercase, dots only |
 
-1. **PRODUCT_NAME in Xcode Build Settings**: Must be exactly `MatrixDigitalRain`
-   - ❌ WRONG: `"Matrix Digital Rain"` (has spaces)
-   - ✅ CORRECT: `MatrixDigitalRain` (no spaces, no quotes needed)
-   - Spaces get converted to underscores in the Swift module name, breaking class lookup
-   - In project.pbxproj, it should appear as: `PRODUCT_NAME = MatrixDigitalRain;`
+**The main view class MUST include the @objc annotation:**
+```swift
+@objc(MatrixDigitalRainView)
+class MatrixDigitalRainView: ScreenSaverView {
+```
 
-2. **NSPrincipalClass in Info.plist**: Must be exactly `MatrixDigitalRainView`
-   - This is the simple class name, not module-qualified
-   - Works because the view class uses `@objc(MatrixDigitalRainView)` annotation
-
-3. **The main view class MUST include the @objc annotation**:
-   ```swift
-   @objc(MatrixDigitalRainView)
-   class MatrixDigitalRainView: ScreenSaverView {
-   ```
-   This exposes the class to Objective-C runtime with a predictable name that matches NSPrincipalClass.
-
-4. **Output bundle name**: The .saver file can still be named "Matrix Digital Rain.saver" for display purposes by setting `PRODUCT_NAME` for the bundle display separately if needed, but the module name must be `MatrixDigitalRain`.
+This exposes the class to Objective-C runtime with a predictable name that matches NSPrincipalClass.
 
 ### Project Structure
 
@@ -592,3 +602,51 @@ rm -rf build/
 7. ✅ CI pipeline passes
 8. ✅ GitHub Pages site is live and SEO-optimized
 9. ✅ Release workflow creates downloadable zip
+
+---
+
+## ⚠️ Verification Checklist (MUST RUN BEFORE COMPLETION)
+
+**Do NOT just restore files from git. Always verify the following:**
+
+### 1. PRODUCT_NAME Check
+```bash
+grep "PRODUCT_NAME" MatrixDigitalRain.xcodeproj/project.pbxproj
+```
+**Expected output:** `PRODUCT_NAME = MatrixDigitalRain;` (NO spaces, NO quotes around value)
+
+If you see `"Matrix Digital Rain"` or any spaces, FIX IT IMMEDIATELY.
+
+### 2. NSPrincipalClass Check
+```bash
+grep -A1 "NSPrincipalClass" MatrixDigitalRain/Info.plist
+```
+**Expected output:** `<string>MatrixDigitalRainView</string>`
+
+### 3. @objc Annotation Check
+```bash
+grep "@objc" MatrixDigitalRain/MatrixDigitalRainView.swift
+```
+**Expected output:** `@objc(MatrixDigitalRainView)`
+
+### 4. Build and Verify Module Name
+```bash
+xcodebuild -scheme MatrixDigitalRain -configuration Release build
+nm build/Build/Products/Release/*.saver/Contents/MacOS/* | grep "OBJC_CLASS.*MatrixDigitalRainView"
+```
+**Expected output:** `_OBJC_CLASS_$_MatrixDigitalRainView` (no underscores in class name except the prefix)
+
+### 5. Clean Old Builds
+Remove any old builds with spaces in the name:
+```bash
+rm -rf "build/Build/Products/Release/Matrix Digital Rain.saver"*
+rm -rf "build/Build/Products/Debug/Matrix Digital Rain.saver"*
+```
+
+### 6. Run Tests
+```bash
+xcodebuild -scheme MatrixDigitalRain test
+```
+All tests must pass.
+
+**Only mark the task complete after ALL verifications pass.**
