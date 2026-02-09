@@ -23,7 +23,7 @@ A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered
 ### Download (Recommended)
 
 1. Download `MatrixDigitalRain.saver.zip` from [Releases](https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest)
-2. Unzip and double-click `Matrix Digital Rain.saver`
+2. Unzip and double-click `MatrixDigitalRain.saver`
 3. Choose **Install for This User Only** or **Install for All Users**
 4. Open **System Settings** > **Screen Saver** and select **Matrix Digital Rain**
 
@@ -40,7 +40,7 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
   build
 
 # Install
-open "build/Build/Products/Release/Matrix Digital Rain.saver"
+open build/Build/Products/Release/MatrixDigitalRain.saver
 ```
 
 ## Requirements
