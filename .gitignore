@@ -1,7 +1,3 @@
-# Node.js / Bun
-node_modules/
-dist/
-
 # macOS
 .DS_Store
 .AppleDouble
@@ -13,14 +9,14 @@ DerivedData/
 *.xcuserstate
 xcuserdata/
 
+# Built screensaver bundles (tracked separately in releases)
+*.saver
+
 # IDE
 .idea/
 .vscode/
 *.swp
 *.swo
-
-# Test artifacts
-test_font.png
 
 # Misc
 .ralph/
