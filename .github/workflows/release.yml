@@ -1,0 +1,37 @@
+name: Release
+
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    name: Build and Upload Release
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build
+        run: |
+          xcodebuild -project MatrixDigitalRain.xcodeproj \
+            -scheme MatrixDigitalRain \
+            -configuration Release \
+            -derivedDataPath build \
+            build
+
+      - name: Create zip
+        run: |
+          cd "build/Build/Products/Release"
+          zip -r "MatrixDigitalRain.saver.zip" "MatrixDigitalRain.saver"
+          mv "MatrixDigitalRain.saver.zip" "$GITHUB_WORKSPACE/"
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: MatrixDigitalRain.saver.zip

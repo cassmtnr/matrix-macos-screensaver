@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matrix Digital Rain - Screensaver for macOS</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <meta name="google-site-verification" content="Ml-ES66Xj2xmgkTnYeJaKPCCoQ_kYxlRqCyVzml-yRk" />
+    <meta
+      name="description"
+      content="A real-time Matrix digital rain screensaver for macOS. Multi-script characters, green fading trails, white heads. Lightweight ~300KB, macOS 11.0+."
+    />
+    <meta
+      name="keywords"
+      content="matrix, screensaver, macos, digital rain, katakana, open source, apple, screen saver"
+    />
+    <meta name="author" content="cassmtnr" />
+    <link
+      rel="canonical"
+      href="https://cassmtnr.github.io/matrix-macos-screensaver/"
+    />
+    <meta
+      property="og:title"
+      content="Matrix Digital Rain - Screensaver for macOS"
+    />
+    <meta
+      property="og:description"
+      content="A real-time Matrix digital rain screensaver for macOS. Multi-script characters, green fading trails, white heads."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:url"
+      content="https://cassmtnr.github.io/matrix-macos-screensaver/"
+    />
+    <meta
+      property="og:image"
+      content="https://cassmtnr.github.io/matrix-macos-screensaver/matrix_preview.gif"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="Matrix Digital Rain - Screensaver for macOS"
+    />
+    <meta
+      name="twitter:description"
+      content="A real-time Matrix digital rain screensaver for macOS."
+    />
+    <meta
+      name="twitter:image"
+      content="https://cassmtnr.github.io/matrix-macos-screensaver/matrix_preview.gif"
+    />
+    <meta name="theme-color" content="#00ff41" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Matrix Digital Rain",
+        "operatingSystem": "macOS",
+        "applicationCategory": "UtilitiesApplication",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "description": "Free Matrix-style digital rain screensaver for macOS",
+        "downloadUrl": "https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest",
+        "softwareRequirements": "macOS 11.0 or later"
+      }
+    </script>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        background: #000;
+        color: #c0c0c0;
+        font-family:
+          'SF Mono', 'Fira Code', 'Cascadia Code', 'JetBrains Mono', 'Consolas',
+          'Courier New', monospace;
+        overflow-x: hidden;
+        min-height: 100vh;
+      }
+
+      canvas#rain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+      }
+
+      .wrapper {
+        position: relative;
+        z-index: 1;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 1.5rem;
+      }
+
+      .page {
+        max-width: 480px;
+        width: 100%;
+        padding: 2.5rem;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 255, 65, 0.08);
+        border-radius: 12px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #00ff41;
+        letter-spacing: 0.04em;
+        line-height: 1.2;
+        text-shadow:
+          0 0 7px rgba(0, 255, 65, 0.35),
+          0 0 20px rgba(0, 255, 65, 0.15),
+          0 0 40px rgba(0, 255, 65, 0.07);
+      }
+
+      .tagline {
+        font-size: 0.9rem;
+        color: #888;
+        margin-top: 0.5rem;
+        font-weight: 400;
+        letter-spacing: 0.02em;
+        line-height: 1.5;
+      }
+
+      .buttons {
+        margin-top: 2rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .btn {
+        display: block;
+        width: 100%;
+        padding: 0.85rem 1.2rem;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        letter-spacing: 0.03em;
+      }
+
+      .btn-download {
+        background: #00ff41;
+        color: #000;
+        border: 2px solid #00ff41;
+      }
+
+      .btn-download:hover {
+        background: #00cc33;
+        border-color: #00cc33;
+        box-shadow: 0 0 20px rgba(0, 255, 65, 0.25);
+      }
+
+      .btn-github {
+        background: transparent;
+        color: #00ff41;
+        border: 2px solid #00ff41;
+      }
+
+      .btn-github:hover {
+        background: rgba(0, 255, 65, 0.08);
+        box-shadow: 0 0 15px rgba(0, 255, 65, 0.15);
+      }
+
+      .coffee {
+        margin-top: 1.5rem;
+        text-align: center;
+      }
+
+      .coffee a {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #000;
+        background: #ffdd00;
+        padding: 0.5rem 1.2rem;
+        border-radius: 6px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        letter-spacing: 0.01em;
+      }
+
+      .coffee a:hover {
+        background: #ffed4a;
+        box-shadow: 0 0 12px rgba(255, 221, 0, 0.3);
+      }
+
+      .footer {
+        margin-top: 2rem;
+        font-size: 0.7rem;
+        color: #777;
+        letter-spacing: 0.04em;
+      }
+
+      @media (max-width: 520px) {
+        .page {
+          padding: 3rem 1.5rem;
+        }
+
+        h1 {
+          font-size: 1.3rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="rain"></canvas>
+
+    <div class="wrapper">
+      <div class="page">
+        <h1>Matrix Digital Rain</h1>
+        <p class="tagline">
+          Real-time falling characters screensaver for macOS
+        </p>
+
+        <div class="buttons">
+          <a
+            href="https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest"
+            class="btn btn-download"
+            >Download</a
+          >
+          <a
+            href="https://github.com/cassmtnr/matrix-macos-screensaver"
+            class="btn btn-github"
+            >GitHub</a
+          >
+        </div>
+
+        <p class="coffee">
+          <a href="https://buymeacoffee.com/cassmtnr">buy me a coffee</a>
+        </p>
+
+        <p class="footer">MIT License &middot; cassmtnr</p>
+      </div>
+    </div>
+
+    <script>
+      const canvas = document.getElementById('rain');
+      const ctx = canvas.getContext('2d');
+      const CHARS =
+        'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン' +
+        'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ' +
+        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
+        'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ' +
+        '가나다라마바사아자차카타파하' +
+        'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ' +
+        '0123456789' +
+        ':<>*+=-@#$%&[?]{!}';
+      const FONT_SIZE = 16;
+      let columns = [];
+
+      function rand(a, b) {
+        return Math.random() * (b - a) + a;
+      }
+      function randChar() {
+        return CHARS[Math.floor(Math.random() * CHARS.length)];
+      }
+      function createCol(i, rows) {
+        const t = Math.floor(rand(10, 30));
+        return {
+          x: i,
+          chars: Array.from({ length: rows }, randChar),
+          headY: rand(-rows * 1.5, -1),
+          speed: rand(0.15, 0.5),
+          trail: t,
+          rows: rows,
+        };
+      }
+
+      function resize() {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+        const c = Math.floor(canvas.width / FONT_SIZE),
+          r = Math.floor(canvas.height / FONT_SIZE) + 5;
+        const active = Array.from({ length: c }, (_, i) => i).filter(
+          () => Math.random() < 0.44,
+        );
+        columns = active.map((i) => createCol(i, r));
+      }
+
+      resize();
+      addEventListener('resize', resize);
+
+      function draw() {
+        ctx.fillStyle = 'rgba(0,0,0,0.92)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.font = FONT_SIZE + 'px monospace';
+        ctx.globalAlpha = 0.55;
+        for (const col of columns) {
+          col.headY += col.speed;
+          if (col.headY - col.trail > col.rows) {
+            col.headY = rand(-col.trail * 2, -col.trail);
+            col.speed = rand(0.15, 0.5);
+            col.trail = Math.floor(rand(10, 30));
+          }
+          for (let i = 0; i < col.chars.length; i++)
+            if (Math.random() < 0.02) col.chars[i] = randChar();
+          const x = col.x * FONT_SIZE;
+          for (let row = 0; row < col.rows; row++) {
+            const dist = col.headY - row;
+            if (dist < 0 || dist > col.trail) continue;
+            const y = (row + 1) * FONT_SIZE;
+            if (dist < 1) {
+              ctx.globalAlpha = 0.85;
+              ctx.fillStyle = '#fff';
+            } else {
+              ctx.globalAlpha = 0.55;
+              ctx.fillStyle =
+                'rgb(0,' +
+                Math.floor(Math.max(0, 1 - dist / col.trail) * 255) +
+                ',0)';
+            }
+            ctx.fillText(col.chars[row % col.chars.length], x, y);
+          }
+        }
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(draw);
+      }
+
+      requestAnimationFrame(draw);
+    </script>
+  </body>
+</html>

@@ -1,147 +1,94 @@
-# Matrix Screensaver
+# Matrix Digital Rain Screensaver
 
-[![CI](https://github.com/cassianomon/matrix-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassianomon/matrix-screensaver/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/cassianomon/matrix-screensaver/graph/badge.svg)](https://codecov.io/gh/cassianomon/matrix-screensaver)
+[![CI](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Platform: macOS](https://img.shields.io/badge/Platform-macOS-blue.svg)](https://www.apple.com/macos/)
-[![Bun](https://img.shields.io/badge/Bun-v1.0+-black.svg)](https://bun.sh)
+[![Platform: macOS](https://img.shields.io/badge/Platform-macOS_11+-blue.svg)](https://www.apple.com/macos/)
+[![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
 
-A Matrix-style "digital rain" screensaver generator for macOS. Creates the iconic falling green characters effect from The Matrix, packaged as a native `.saver` bundle.
+A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered falling green characters.
 
-![Matrix Rain Effect](https://upload.wikimedia.org/wikipedia/commons/c/cc/Digital_rain_animation_small_letters_shine.gif)
+![Matrix Rain Preview](docs/matrix_preview.gif)
 
 ## Features
 
-- **Authentic Matrix rain effect** with falling characters, glowing heads, and fading trails
-- **Multi-script character set**: Japanese katakana, Latin, Cyrillic, Korean, Greek, and symbols
-- **Native macOS screensaver** bundle (`.saver`) - no third-party apps needed
-- **Configurable**: resolution, duration, FPS, colors, and character sets
-- **High quality H.264 video** output with seamless looping
-
-## Requirements
-
-- [Bun](https://bun.sh) (v1.0+)
-- [ffmpeg](https://ffmpeg.org) for video encoding
-- Xcode Command Line Tools for building the `.saver` bundle
+- **Authentic Matrix effect** - Falling characters with glowing heads and fading trails
+- **Multi-script characters** - Japanese katakana, Latin, Cyrillic, Korean, Greek, symbols
+- **Real-time rendering** - Core Graphics powered, no video files
+- **Lightweight** - ~300KB bundle size
+- **Adaptive** - Automatically scales to any screen resolution
+- **Infinite duration** - No looping, runs forever
 
 ## Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/matrix-screensaver.git
-cd matrix-screensaver
+### Download (Recommended)
 
-# Install dependencies
-bun install
+1. Download `MatrixDigitalRain.saver.zip` from [Releases](https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest)
+2. Unzip and double-click `MatrixDigitalRain.saver`
+3. Choose **Install for This User Only** or **Install for All Users**
+4. Open **System Settings** > **Screen Saver** and select **Matrix Digital Rain**
 
-# Install ffmpeg (macOS)
-brew install ffmpeg
-
-# Install Xcode Command Line Tools (if not already installed)
-xcode-select --install
-```
-
-## Usage
+### Build from Source
 
 ```bash
-# Generate the screensaver
-bun start
+git clone https://github.com/cassmtnr/matrix-macos-screensaver.git
+cd matrix-macos-screensaver
+
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Release \
+  -derivedDataPath build \
+  build
+
+# Install
+open build/Build/Products/Release/MatrixDigitalRain.saver
 ```
 
-This will:
-1. Generate 1800 PNG frames (60 seconds at 30 FPS)
-2. Encode them into an H.264 video
-3. Build the macOS screensaver bundle
-4. Output `MatrixSaver.saver` ready for installation
+## Requirements
 
-### Installing the Screensaver
-
-- **Double-click** `MatrixSaver.saver` to install, or
-- Copy to `~/Library/Screen Savers/` manually
-
-### Activating
-
-1. Open **System Settings** → **Screen Saver**
-2. Select **MatrixSaver** from the list
-
-## Configuration
-
-Edit `src/config.ts` to customize:
-
-| Option | Default | Description |
-|--------|---------|-------------|
-| `WIDTH` | 1920 | Video width in pixels |
-| `HEIGHT` | 1080 | Video height in pixels |
-| `FPS` | 30 | Frames per second |
-| `DURATION_SECONDS` | 60 | Video length (screensaver loops) |
-| `FONT_SIZE` | 18 | Character size in pixels |
-| `MATRIX_CHARS` | (mixed) | Character set for the rain |
-| `COLOR_KEYFRAMES` | Green | Color transitions over time |
-
-### Color Transitions
-
-You can create color transitions by modifying `COLOR_KEYFRAMES`:
-
-```typescript
-export const COLOR_KEYFRAMES: ColorKeyframe[] = [
-  { time: 0, hue: 120 },    // Start green
-  { time: 30, hue: 240 },   // Transition to blue by 30s
-  { time: 60, hue: 120 },   // Back to green by 60s
-];
-```
-
-Hue reference: 0=Red, 60=Yellow, 120=Green, 180=Cyan, 240=Blue, 300=Magenta
+- macOS 11.0 (Big Sur) or later
 
 ## Development
 
+### Project Structure
+
+```
+MatrixDigitalRain/
+├── MatrixDigitalRain.xcodeproj/
+├── MatrixDigitalRain/
+│   ├── MatrixConfig.swift       # Configuration constants
+│   ├── MatrixColumn.swift       # Falling column logic
+│   ├── MatrixDigitalRainView.swift  # Main screensaver view
+│   └── Info.plist               # Bundle metadata
+├── MatrixDigitalRainTests/      # Unit tests
+├── docs/                        # GitHub Pages website
+└── .github/workflows/           # CI/CD
+```
+
+### Build Commands
+
 ```bash
-# Run with watch mode
-bun run dev
+# Build Release
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Release \
+  -derivedDataPath build \
+  build
 
-# Lint code
-bun run lint
+# Run Tests
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Debug \
+  test
 
-# Auto-fix lint issues
-bun run lint:fix
-
-# Format code
-bun run format
-
-# Run tests
-bun test
+# Clean
+xcodebuild -project MatrixDigitalRain.xcodeproj clean
+rm -rf build/
 ```
 
-## Project Structure
+## Contributing
 
-```
-matrix-screensaver/
-├── src/
-│   ├── index.ts          # Main entry point
-│   ├── config.ts         # Configuration constants
-│   ├── types.ts          # TypeScript interfaces
-│   ├── colors.ts         # HSV/RGB conversion, hue interpolation
-│   ├── MatrixColumn.ts   # Falling column logic
-│   ├── fontLoader.ts     # Font registration
-│   ├── frameGenerator.ts # Canvas-based frame rendering
-│   ├── videoEncoder.ts   # ffmpeg wrapper
-│   ├── bundleBuilder.ts  # xcodebuild wrapper
-│   └── __tests__/        # Unit tests
-├── MatrixSaver/          # Swift screensaver source
-├── MatrixSaver.xcodeproj # Xcode project
-├── biome.json            # Linter configuration
-├── tsconfig.json         # TypeScript configuration
-└── package.json
-```
-
-## How It Works
-
-1. **Frame Generation**: Uses [@napi-rs/canvas](https://github.com/Brooooooklyn/canvas) to render each frame with falling characters
-2. **Video Encoding**: Pipes PNG frames to ffmpeg for H.264 encoding
-3. **Bundle Building**: Compiles the Swift screensaver wrapper with xcodebuild
-4. **Video Embedding**: Copies the video into the `.saver` bundle's Resources folder
-
-The screensaver itself is a lightweight Swift app that uses AVPlayer to loop the generated video.
+Contributions are welcome. Please open an issue or submit a pull request.
 
 ## License
 
-MIT
+MIT License - feel free to use, modify, and distribute.
