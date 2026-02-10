@@ -186,24 +186,16 @@
       }
 
       .coffee a {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        font-family: 'Lato', 'Helvetica Neue', Arial, sans-serif;
-        font-size: 0.8rem;
-        font-weight: 700;
-        color: #000;
-        background: #ffdd00;
-        padding: 0.5rem 1.2rem;
-        border-radius: 6px;
-        text-decoration: none;
-        transition: all 0.2s ease;
-        letter-spacing: 0.01em;
+        display: inline-block;
+        transition: opacity 0.2s ease;
       }
 
       .coffee a:hover {
-        background: #ffed4a;
-        box-shadow: 0 0 12px rgba(255, 221, 0, 0.3);
+        opacity: 0.85;
+      }
+
+      .coffee img {
+        height: 36px;
       }
 
       .footer {
@@ -248,7 +240,7 @@
         </div>
 
         <p class="coffee">
-          <a href="https://buymeacoffee.com/cassmtnr">buy me a coffee</a>
+          <a href="https://buymeacoffee.com/cassmtnr" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
         </p>
 
         <p class="footer">MIT License &middot; cassmtnr</p>
