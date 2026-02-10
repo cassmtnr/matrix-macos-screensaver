@@ -8,7 +8,7 @@
     <meta name="google-site-verification" content="Ml-ES66Xj2xmgkTnYeJaKPCCoQ_kYxlRqCyVzml-yRk" />
     <meta
       name="description"
-      content="A real-time Matrix digital rain screensaver for macOS. Multi-script characters, green fading trails, white heads. Lightweight ~300KB, macOS 11.0+."
+      content="A real-time Matrix digital rain screensaver for macOS. Matrix-Code font glyphs, green fading trails, white heads. Lightweight ~300KB, macOS 11.0+."
     />
     <meta
       name="keywords"
@@ -25,7 +25,7 @@
     />
     <meta
       property="og:description"
-      content="A real-time Matrix digital rain screensaver for macOS. Multi-script characters, green fading trails, white heads."
+      content="A real-time Matrix digital rain screensaver for macOS. Matrix-Code font glyphs, green fading trails, white heads."
     />
     <meta property="og:type" content="website" />
     <meta
@@ -84,32 +84,19 @@
         min-height: 100vh;
       }
 
-      canvas#rain {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-      }
-
       .wrapper {
-        position: relative;
-        z-index: 1;
         min-height: 100vh;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 3rem 1.5rem;
+        padding: 2rem;
       }
 
       .page {
-        max-width: 480px;
+        max-width: 780px;
         width: 100%;
         padding: 2.5rem;
         background: rgba(0, 0, 0, 0.8);
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
         border: 1px solid rgba(0, 255, 65, 0.08);
         border-radius: 12px;
       }
@@ -133,6 +120,19 @@
         font-weight: 400;
         letter-spacing: 0.02em;
         line-height: 1.5;
+      }
+
+      .preview {
+        margin-top: 1.5rem;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid rgba(0, 255, 65, 0.12);
+      }
+
+      .preview img {
+        display: block;
+        width: 100%;
+        height: auto;
       }
 
       .buttons {
@@ -180,6 +180,35 @@
         box-shadow: 0 0 15px rgba(0, 255, 65, 0.15);
       }
 
+      .install {
+        margin-top: 2rem;
+      }
+
+      .install h2 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #00ff41;
+        margin-bottom: 0.75rem;
+        letter-spacing: 0.03em;
+      }
+
+      .install ol {
+        padding-left: 1.4rem;
+        font-size: 0.85rem;
+        color: #aaa;
+        line-height: 1.8;
+      }
+
+      .install code {
+        background: rgba(0, 255, 65, 0.08);
+        border: 1px solid rgba(0, 255, 65, 0.15);
+        border-radius: 3px;
+        padding: 0.15rem 0.4rem;
+        font-size: 0.8rem;
+        color: #00ff41;
+        word-break: break-all;
+      }
+
       .coffee {
         margin-top: 1.5rem;
         text-align: center;
@@ -217,14 +246,16 @@
     </style>
   </head>
   <body>
-    <canvas id="rain"></canvas>
-
     <div class="wrapper">
       <div class="page">
         <h1>Matrix Digital Rain</h1>
         <p class="tagline">
           Real-time falling characters screensaver for macOS
         </p>
+
+        <div class="preview">
+          <img src="matrix_preview.gif" alt="Matrix Digital Rain screensaver preview" />
+        </div>
 
         <div class="buttons">
           <a
@@ -239,6 +270,16 @@
           >
         </div>
 
+        <div class="install">
+          <h2>Installation</h2>
+          <ol>
+            <li>Download and unzip the <code>.saver</code> file</li>
+            <li>Open Terminal and remove quarantine:<br /><code>xattr -cr ~/Downloads/MatrixDigitalRain.saver</code></li>
+            <li>Double-click the <code>.saver</code> file to install</li>
+            <li>Go to <strong>System Settings</strong> &gt; <strong>Screen Saver</strong> and select it</li>
+          </ol>
+        </div>
+
         <p class="coffee">
           <a href="https://buymeacoffee.com/cassmtnr" target="_blank" rel="noopener"><img src="https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black" alt="Buy Me A Coffee"></a>
         </p>
@@ -246,92 +287,5 @@
         <p class="footer">MIT License &middot; cassmtnr</p>
       </div>
     </div>
-
-    <script>
-      const canvas = document.getElementById('rain');
-      const ctx = canvas.getContext('2d');
-      const CHARS =
-        'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン' +
-        'ガギグゲゴザジズゼゾダヂヅデドバビブベボパピプペポ' +
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ' +
-        'АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ' +
-        '가나다라마바사아자차카타파하' +
-        'ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩ' +
-        '0123456789' +
-        ':<>*+=-@#$%&[?]{!}';
-      const FONT_SIZE = 16;
-      let columns = [];
-
-      function rand(a, b) {
-        return Math.random() * (b - a) + a;
-      }
-      function randChar() {
-        return CHARS[Math.floor(Math.random() * CHARS.length)];
-      }
-      function createCol(i, rows) {
-        const t = Math.floor(rand(10, 30));
-        return {
-          x: i,
-          chars: Array.from({ length: rows }, randChar),
-          headY: rand(-rows * 1.5, -1),
-          speed: rand(0.15, 0.5),
-          trail: t,
-          rows: rows,
-        };
-      }
-
-      function resize() {
-        canvas.width = innerWidth;
-        canvas.height = innerHeight;
-        const c = Math.floor(canvas.width / FONT_SIZE),
-          r = Math.floor(canvas.height / FONT_SIZE) + 5;
-        const active = Array.from({ length: c }, (_, i) => i).filter(
-          () => Math.random() < 0.44,
-        );
-        columns = active.map((i) => createCol(i, r));
-      }
-
-      resize();
-      addEventListener('resize', resize);
-
-      function draw() {
-        ctx.fillStyle = 'rgba(0,0,0,0.92)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        ctx.font = FONT_SIZE + 'px monospace';
-        ctx.globalAlpha = 0.55;
-        for (const col of columns) {
-          col.headY += col.speed;
-          if (col.headY - col.trail > col.rows) {
-            col.headY = rand(-col.trail * 2, -col.trail);
-            col.speed = rand(0.15, 0.5);
-            col.trail = Math.floor(rand(10, 30));
-          }
-          for (let i = 0; i < col.chars.length; i++)
-            if (Math.random() < 0.02) col.chars[i] = randChar();
-          const x = col.x * FONT_SIZE;
-          for (let row = 0; row < col.rows; row++) {
-            const dist = col.headY - row;
-            if (dist < 0 || dist > col.trail) continue;
-            const y = (row + 1) * FONT_SIZE;
-            if (dist < 1) {
-              ctx.globalAlpha = 0.85;
-              ctx.fillStyle = '#fff';
-            } else {
-              ctx.globalAlpha = 0.55;
-              ctx.fillStyle =
-                'rgb(0,' +
-                Math.floor(Math.max(0, 1 - dist / col.trail) * 255) +
-                ',0)';
-            }
-            ctx.fillText(col.chars[row % col.chars.length], x, y);
-          }
-        }
-        ctx.globalAlpha = 1;
-        requestAnimationFrame(draw);
-      }
-
-      requestAnimationFrame(draw);
-    </script>
   </body>
 </html>
