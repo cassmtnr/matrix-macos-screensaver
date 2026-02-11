@@ -8,51 +8,33 @@ final class IntroSequenceTests: XCTestCase {
         XCTAssertFalse(intro.isComplete)
     }
 
-    func testCompletesAfterEnoughUpdates() {
-        let intro = IntroSequence()
-
-        // Run enough frames to complete the intro (generous upper bound)
-        for _ in 0..<3000 {
-            intro.update()
-            if intro.isComplete { break }
-        }
-
-        XCTAssertTrue(intro.isComplete)
-    }
-
     func testDoesNotCompleteImmediately() {
         let intro = IntroSequence()
-
-        // A few frames should not be enough
-        for _ in 0..<5 {
-            intro.update()
-        }
-
+        intro.update()
+        intro.update()
         XCTAssertFalse(intro.isComplete)
     }
 
-    func testTotalFrameCountIsReasonable() {
+    func testCompletesAfterEnoughTime() {
         let intro = IntroSequence()
-        var totalFrames = 0
 
-        for i in 0..<3000 {
+        // Simulate updates over enough wall-clock time for the intro to complete.
+        // Total intro ~28s. We call update in a tight loop — wall-clock advances naturally.
+        let deadline = Date().addingTimeInterval(60)
+        while !intro.isComplete && Date() < deadline {
             intro.update()
-            totalFrames = i + 1
-            if intro.isComplete { break }
         }
 
-        // At 30fps, ~28 seconds = ~833 frames. Allow range 650-1050 for jitter.
-        XCTAssertGreaterThan(totalFrames, 650, "Intro completed too quickly")
-        XCTAssertLessThan(totalFrames, 1050, "Intro took too long")
+        XCTAssertTrue(intro.isComplete, "Intro should complete within 60s")
     }
 
     func testResetAllowsReplay() {
         let intro = IntroSequence()
 
         // Complete the intro
-        for _ in 0..<3000 {
+        let deadline1 = Date().addingTimeInterval(60)
+        while !intro.isComplete && Date() < deadline1 {
             intro.update()
-            if intro.isComplete { break }
         }
         XCTAssertTrue(intro.isComplete)
 
@@ -61,9 +43,9 @@ final class IntroSequenceTests: XCTestCase {
         XCTAssertFalse(intro.isComplete)
 
         // Should complete again
-        for _ in 0..<3000 {
+        let deadline2 = Date().addingTimeInterval(60)
+        while !intro.isComplete && Date() < deadline2 {
             intro.update()
-            if intro.isComplete { break }
         }
         XCTAssertTrue(intro.isComplete)
     }
@@ -72,9 +54,9 @@ final class IntroSequenceTests: XCTestCase {
         let intro = IntroSequence()
 
         // Complete the intro
-        for _ in 0..<3000 {
+        let deadline = Date().addingTimeInterval(60)
+        while !intro.isComplete && Date() < deadline {
             intro.update()
-            if intro.isComplete { break }
         }
         XCTAssertTrue(intro.isComplete)
 

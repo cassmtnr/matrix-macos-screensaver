@@ -2,7 +2,8 @@ import Cocoa
 import CoreText
 
 /// State machine that manages the "Wake up, Neo..." intro sequence.
-/// Uses frame counting for deterministic, headless-compatible timing.
+/// Uses wall-clock timing so the intro runs at consistent real-world speed
+/// regardless of the actual frame rate.
 class IntroSequence {
 
     // MARK: - Types
@@ -17,76 +18,58 @@ class IntroSequence {
     // MARK: - State
 
     private var phase: Phase = .initialDelay
-    private var frameCount: Int = 0
+    private var startTime: Date = Date()
+    private var phaseStartTime: Date = Date()
     private var charIndex: Int = 0
-    private var nextCharFrame: Int = 0
-    private var cursorBlinkFrame: Int = 0
+    private var nextCharTime: TimeInterval = 0
+    private var lastCursorToggle: Date = Date()
     private var cursorVisible: Bool = true
-    private var pauseStartFrame: Int = 0
 
     private(set) var isComplete: Bool = false
-
-    // MARK: - Precomputed frame counts
-
-    private let initialDelayFrames: Int
-    private let framesPerChar: Int
-    private let jitterFrames: Int
-    private let pauseFrames: [Int]
-    private let cursorBlinkFrames: Int
-
-    // MARK: - Init
-
-    init() {
-        let fps = MatrixConfig.fps
-        initialDelayFrames = max(1, Int(round(MatrixConfig.introInitialDelay * fps)))
-        framesPerChar = max(1, Int(round(MatrixConfig.introTypingSpeed * fps)))
-        jitterFrames = max(0, Int(round(MatrixConfig.introTypingJitter * fps)))
-        pauseFrames = MatrixConfig.introPauseDurations.map { max(1, Int(round($0 * fps))) }
-        cursorBlinkFrames = max(1, Int(round(MatrixConfig.introCursorBlinkRate * fps)))
-        nextCharFrame = 0
-    }
 
     // MARK: - Update (call once per frame)
 
     func update() {
         guard !isComplete else { return }
-        frameCount += 1
+        let now = Date()
+        let elapsed = now.timeIntervalSince(startTime)
+        let phaseElapsed = now.timeIntervalSince(phaseStartTime)
 
         // Update cursor blink
-        if frameCount - cursorBlinkFrame >= cursorBlinkFrames {
+        if now.timeIntervalSince(lastCursorToggle) >= MatrixConfig.introCursorBlinkRate {
             cursorVisible.toggle()
-            cursorBlinkFrame = frameCount
+            lastCursorToggle = now
         }
 
         switch phase {
         case .initialDelay:
-            if frameCount >= initialDelayFrames {
-                startLine(0)
+            if elapsed >= MatrixConfig.introInitialDelay {
+                startLine(0, at: now)
             }
 
         case .typing(let lineIndex):
             let line = MatrixConfig.introLines[lineIndex]
-            if frameCount >= nextCharFrame {
+            if phaseElapsed >= nextCharTime {
                 charIndex += 1
                 if charIndex >= line.count {
-                    // Line finished typing — transition to pause
                     phase = .pause(lineIndex: lineIndex)
-                    pauseStartFrame = frameCount
+                    phaseStartTime = now
                     cursorVisible = true
-                    cursorBlinkFrame = frameCount
+                    lastCursorToggle = now
                 } else {
-                    nextCharFrame = frameCount + framesPerChar + randomJitter()
+                    nextCharTime = phaseElapsed + MatrixConfig.introTypingSpeed + randomJitter()
                 }
             }
 
         case .pause(let lineIndex):
-            let pauseDuration = lineIndex < pauseFrames.count ? pauseFrames[lineIndex] : pauseFrames.last!
-            if frameCount - pauseStartFrame >= pauseDuration {
+            let pauseDuration = lineIndex < MatrixConfig.introPauseDurations.count
+                ? MatrixConfig.introPauseDurations[lineIndex]
+                : MatrixConfig.introPauseDurations.last!
+            if phaseElapsed >= pauseDuration {
                 let nextIndex = lineIndex + 1
                 if nextIndex < MatrixConfig.introLines.count {
-                    startLine(nextIndex)
+                    startLine(nextIndex, at: now)
                 } else {
-                    // All lines done
                     phase = .done
                     isComplete = true
                 }
@@ -149,38 +132,39 @@ class IntroSequence {
     // MARK: - Reset
 
     func reset() {
+        let now = Date()
         phase = .initialDelay
-        frameCount = 0
+        startTime = now
+        phaseStartTime = now
         charIndex = 0
-        nextCharFrame = 0
-        cursorBlinkFrame = 0
+        nextCharTime = 0
+        lastCursorToggle = now
         cursorVisible = true
-        pauseStartFrame = 0
         isComplete = false
     }
 
     // MARK: - Private
 
-    private func startLine(_ lineIndex: Int) {
+    private func startLine(_ lineIndex: Int, at now: Date) {
         let line = MatrixConfig.introLines[lineIndex]
         if MatrixConfig.introInstantLines.contains(lineIndex) {
-            // Appear all at once — skip typing, go straight to pause
             charIndex = line.count
             phase = .pause(lineIndex: lineIndex)
-            pauseStartFrame = frameCount
+            phaseStartTime = now
             cursorVisible = true
-            cursorBlinkFrame = frameCount
+            lastCursorToggle = now
         } else {
             phase = .typing(lineIndex: lineIndex)
+            phaseStartTime = now
             charIndex = 0
-            nextCharFrame = frameCount + framesPerChar + randomJitter()
+            nextCharTime = MatrixConfig.introTypingSpeed + randomJitter()
             cursorVisible = true
-            cursorBlinkFrame = frameCount
+            lastCursorToggle = now
         }
     }
 
-    private func randomJitter() -> Int {
-        guard jitterFrames > 0 else { return 0 }
-        return Int.random(in: -jitterFrames...jitterFrames)
+    private func randomJitter() -> TimeInterval {
+        guard MatrixConfig.introTypingJitter > 0 else { return 0 }
+        return Double.random(in: -MatrixConfig.introTypingJitter...MatrixConfig.introTypingJitter)
     }
 }
