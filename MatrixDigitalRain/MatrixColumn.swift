@@ -7,19 +7,25 @@ final class MatrixColumn {
     private(set) var headY: Double
     private(set) var speed: Double
     private(set) var trailLength: Int
+    private var remainingStartDelay: Int
 
     init(columnIndex: Int, numRows: Int) {
         self.columnIndex = columnIndex
         self.numRows = numRows
         self.chars = (0..<numRows).map { _ in MatrixConfig.randomChar() }
-        // Start columns at random positions across the screen so content is visible immediately
-        // This ensures the thumbnail preview shows the matrix effect, not a black screen
-        self.headY = Double.random(in: 0..<Double(numRows))
+        // Start columns above the screen so the screensaver begins with a black screen
+        self.headY = -1
         self.speed = Double.random(in: MatrixConfig.minSpeed...MatrixConfig.maxSpeed)
         self.trailLength = Int.random(in: MatrixConfig.minTrailLength...MatrixConfig.maxTrailLength)
+        self.remainingStartDelay = Int.random(in: 0..<MatrixConfig.maxColumnStaggerFrames)
     }
 
     func update() {
+        if remainingStartDelay > 0 {
+            remainingStartDelay -= 1
+            return
+        }
+
         headY += speed
 
         // Reset when off screen

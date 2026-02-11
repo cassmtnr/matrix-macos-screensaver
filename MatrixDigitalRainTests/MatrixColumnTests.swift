@@ -48,11 +48,11 @@ final class MatrixColumnTests: XCTestCase {
 
     func testBrightnessDecreaseAlongTrail() {
         let column = MatrixColumn(columnIndex: 0, numRows: 60)
-        // Advance until head is in visible range
+        // Advance until head is far enough from the top to have a visible trail behind it
         var headRow = -1
-        for _ in 0..<500 {
+        for _ in 0..<2000 {
             column.update()
-            for row in 0..<60 {
+            for row in 10..<60 {
                 if column.getBrightness(row: row) >= 0.95 {
                     headRow = row
                     break

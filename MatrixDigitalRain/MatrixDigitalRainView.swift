@@ -9,6 +9,7 @@ class MatrixDigitalRainView: ScreenSaverView {
     private var ctFont: CTFont!
     private var glyphCache: [Character: CGGlyph] = [:]
     private static var fontRegistered = false
+    private var animationStartTime: Date?
 
     override init?(frame: NSRect, isPreview: Bool) {
         super.init(frame: frame, isPreview: isPreview)
@@ -68,6 +69,7 @@ class MatrixDigitalRainView: ScreenSaverView {
 
     override func startAnimation() {
         super.startAnimation()
+        animationStartTime = Date()
         initializeIfNeeded()
     }
 
@@ -83,7 +85,10 @@ class MatrixDigitalRainView: ScreenSaverView {
 
     override func animateOneFrame() {
         initializeIfNeeded()
-        for column in columns { column.update() }
+        if let startTime = animationStartTime,
+           Date().timeIntervalSince(startTime) >= MatrixConfig.startDelay {
+            for column in columns { column.update() }
+        }
         needsDisplay = true
     }
 

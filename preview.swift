@@ -1,9 +1,9 @@
 #!/usr/bin/swift
 // Quick preview app — runs the screensaver view in a regular window
 // so you can screen-record it. Usage:
-//   swift preview.swift
-// Then use Cmd+Shift+5 to record the window.
-// Press Cmd+Q to quit.
+//   swift preview.swift                    # manual quit with Cmd+Q
+//   swift preview.swift --duration 20      # auto-quit after 20 seconds
+// Press Cmd+Q to quit early.
 
 import Cocoa
 import ScreenSaver
@@ -47,6 +47,15 @@ saverView.startAnimation()
 // Timer to drive animation
 Timer.scheduledTimer(withTimeInterval: saverView.animationTimeInterval, repeats: true) { _ in
     saverView.animateOneFrame()
+}
+
+// Auto-quit after --duration seconds (if provided)
+if let idx = CommandLine.arguments.firstIndex(of: "--duration"),
+   idx + 1 < CommandLine.arguments.count,
+   let duration = Double(CommandLine.arguments[idx + 1]) {
+    Timer.scheduledTimer(withTimeInterval: duration, repeats: false) { _ in
+        NSApplication.shared.terminate(nil)
+    }
 }
 
 app.activate(ignoringOtherApps: true)
