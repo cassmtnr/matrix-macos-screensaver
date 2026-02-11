@@ -100,7 +100,7 @@ swift generate_preview.swift --duration 12 --skip 6 --output docs/matrix_preview
 swift generate_preview.swift --help   # see all options
 ```
 
-The [Release](.github/workflows/release.yml) workflow runs this automatically on releases, commits the GIF to the repo, and redeploys GitHub Pages.
+The [Release](.github/workflows/release.yml) workflow runs this automatically on releases and commits the GIF to the repo.
 
 ### Build Commands
 
