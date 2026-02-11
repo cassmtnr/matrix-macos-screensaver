@@ -41,9 +41,9 @@ final class IntroSequenceTests: XCTestCase {
             if intro.isComplete { break }
         }
 
-        // At 30fps, ~37 seconds = ~1110 frames. Allow range 900-1400 for jitter.
-        XCTAssertGreaterThan(totalFrames, 900, "Intro completed too quickly")
-        XCTAssertLessThan(totalFrames, 1400, "Intro took too long")
+        // At 30fps, ~28 seconds = ~833 frames. Allow range 650-1050 for jitter.
+        XCTAssertGreaterThan(totalFrames, 650, "Intro completed too quickly")
+        XCTAssertLessThan(totalFrames, 1050, "Intro took too long")
     }
 
     func testResetAllowsReplay() {

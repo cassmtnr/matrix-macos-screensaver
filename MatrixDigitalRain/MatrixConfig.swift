@@ -21,7 +21,7 @@ struct MatrixConfig {
         "Knock, knock, Neo.",
     ]
     static let introInstantLines: Set<Int> = [3]   // line indices that appear all at once (no typing)
-    static let introTypingSpeed: Double = 0.25     // 336ms per character (~5s for 15-char line)
+    static let introTypingSpeed: Double = 0.25     // 250ms per character (~3.75s for 15-char line)
     static let introTypingJitter: Double = 0.05     // ±50ms randomness
     static let introPauseDurations: [Double] = [2.5, 2.5, 2.5, 2.5]  // pause after each line
     static let introCursorBlinkRate: Double = 0.66  // cursor blink interval (seconds)

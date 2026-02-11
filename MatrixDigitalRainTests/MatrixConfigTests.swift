@@ -40,7 +40,7 @@ final class MatrixConfigTests: XCTestCase {
         XCTAssertEqual(MatrixConfig.fps, 30)
         XCTAssertLessThan(MatrixConfig.minSpeed, MatrixConfig.maxSpeed)
         XCTAssertLessThan(MatrixConfig.minTrailLength, MatrixConfig.maxTrailLength)
-        XCTAssertEqual(MatrixConfig.startDelay, 4.20 / 2)
+        XCTAssertEqual(MatrixConfig.startDelay, 2)
     }
 
     func testIntroConfigValues() {
