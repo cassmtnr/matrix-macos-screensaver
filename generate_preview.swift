@@ -19,8 +19,8 @@ import ScreenSaver
 
 var duration: Double = 30
 var skip: Double = 0
-var gifWidth: Int = 960
-var gifFps: Int = 15
+var gifWidth: Int = 1280
+var gifFps: Int = 20
 var renderWidth: Int = 1920
 var renderHeight: Int = 1080
 var output: String = "docs/matrix_preview.gif"
@@ -214,7 +214,7 @@ guard runFFmpeg([
     "-y",
     "-framerate", String(gifFps),
     "-i", inputPattern,
-    "-vf", "scale=\(gifWidth):-1:flags=lanczos,palettegen=stats_mode=diff",
+    "-vf", "scale=\(gifWidth):-1:flags=lanczos,palettegen=max_colors=256:stats_mode=full",
     palette,
     "-loglevel", "warning"
 ]) else {
@@ -229,7 +229,7 @@ guard runFFmpeg([
     "-framerate", String(gifFps),
     "-i", inputPattern,
     "-i", palette,
-    "-filter_complex", "[0:v]scale=\(gifWidth):-1:flags=lanczos[s];[s][1:v]paletteuse=dither=bayer:bayer_scale=3",
+    "-filter_complex", "[0:v]scale=\(gifWidth):-1:flags=lanczos[s];[s][1:v]paletteuse=dither=sierra2_4a",
     output,
     "-loglevel", "warning"
 ]) else {

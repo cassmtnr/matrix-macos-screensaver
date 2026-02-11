@@ -6,12 +6,15 @@
 [![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cassmtnr)
 
-A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered falling green characters.
+A Matrix-style "digital rain" screensaver for macOS featuring the iconic intro sequence and real-time rendered falling green characters.
 
-![Matrix Rain Preview](docs/matrix_preview.gif?1)
+<p align="center">
+  <img src="docs/matrix_preview.gif" alt="Matrix Rain Preview" width="100%">
+</p>
 
 ## Features
 
+- **Iconic intro sequence** - "Wake up, Neo..." typed character by character with blinking cursor, followed by "The Matrix has you...", "Follow the white rabbit.", and "Knock, knock, Neo." — just like the film
 - **Authentic Matrix effect** - Falling characters with glowing heads and fading trails
 - **Matrix-Code font** - 57 custom glyphs from the Matrix films (mirrored katakana, digits, symbols)
 - **Real-time rendering** - Core Text glyph rendering, no video files
@@ -65,6 +68,7 @@ MatrixDigitalRain/
 │   ├── Matrix-Code.ttf              # Custom Matrix font (57 glyphs)
 │   ├── MatrixConfig.swift           # Configuration constants
 │   ├── MatrixColumn.swift           # Falling column logic
+│   ├── IntroSequence.swift          # "Wake up, Neo..." intro state machine
 │   ├── MatrixDigitalRainView.swift  # Main screensaver view
 │   └── Info.plist                   # Bundle metadata
 ├── MatrixDigitalRainTests/          # Unit tests
