@@ -8,7 +8,7 @@
 
 A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered falling green characters.
 
-![Matrix Rain Preview](docs/matrix_preview.gif)
+![Matrix Rain Preview](docs/matrix_preview.gif?1)
 
 ## Features
 
