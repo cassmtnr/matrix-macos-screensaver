@@ -68,8 +68,30 @@ MatrixDigitalRain/
 │   ├── MatrixDigitalRainView.swift  # Main screensaver view
 │   └── Info.plist                 # Bundle metadata
 ├── MatrixDigitalRainTests/      # Unit tests
+├── preview.swift                # Standalone preview for screen recording
 ├── docs/                        # GitHub Pages website
 └── .github/workflows/           # CI/CD
+```
+
+### Preview (for screen recording)
+
+macOS stops the screen saver when you start a screen recording. Use the preview script to run the effect in a regular fullscreen window that you can record:
+
+```bash
+# Build first, then run the preview
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Release \
+  -derivedDataPath build \
+  build
+
+swift preview.swift
+```
+
+Use **Cmd+Shift+5** to record the window, then **Cmd+Q** to quit. Convert to GIF:
+
+```bash
+ffmpeg -i recording.mov -vf "fps=15,scale=960:-1" -loop 0 docs/matrix_preview.gif
 ```
 
 ### Build Commands
