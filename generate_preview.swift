@@ -17,8 +17,8 @@ import ScreenSaver
 
 // ── CLI argument parsing ────────────────────────────────────────────────────────
 
-var duration: Double = 12
-var skip: Double = 24
+var duration: Double = 30
+var skip: Double = 0
 var gifWidth: Int = 960
 var gifFps: Int = 15
 var renderWidth: Int = 1920
