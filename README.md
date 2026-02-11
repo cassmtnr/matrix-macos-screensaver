@@ -13,9 +13,10 @@ A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered
 ## Features
 
 - **Authentic Matrix effect** - Falling characters with glowing heads and fading trails
-- **Multi-script characters** - Japanese katakana, Latin, Cyrillic, Korean, Greek, symbols
-- **Real-time rendering** - Core Graphics powered, no video files
-- **Lightweight** - ~300KB bundle size
+- **Matrix-Code font** - 57 custom glyphs from the Matrix films (mirrored katakana, digits, symbols)
+- **Real-time rendering** - Core Text glyph rendering, no video files
+- **Multi-display** - Works across all connected screens
+- **Performance optimized** - Pre-cached glyph rendering, zero allocations per frame
 - **Adaptive** - Automatically scales to any screen resolution
 - **Infinite duration** - No looping, runs forever
 
@@ -24,9 +25,14 @@ A Matrix-style "digital rain" screensaver for macOS featuring real-time rendered
 ### Download (Recommended)
 
 1. Download `MatrixDigitalRain.saver.zip` from [Releases](https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest)
-2. Unzip and double-click `MatrixDigitalRain.saver`
-3. Choose **Install for This User Only** or **Install for All Users**
-4. Open **System Settings** > **Screen Saver** and select **Matrix Digital Rain**
+2. Unzip the file
+3. Remove the quarantine attribute (macOS blocks unsigned downloads):
+   ```bash
+   xattr -cr ~/Downloads/MatrixDigitalRain.saver
+   ```
+4. Double-click `MatrixDigitalRain.saver`
+5. Choose **Install for This User Only** or **Install for All Users**
+6. Open **System Settings** > **Screen Saver** and select **Matrix Digital Rain**
 
 ### Build from Source
 
@@ -56,13 +62,36 @@ open build/Build/Products/Release/MatrixDigitalRain.saver
 MatrixDigitalRain/
 ├── MatrixDigitalRain.xcodeproj/
 ├── MatrixDigitalRain/
-│   ├── MatrixConfig.swift       # Configuration constants
-│   ├── MatrixColumn.swift       # Falling column logic
+│   ├── Matrix-Code.ttf            # Custom Matrix font (57 glyphs)
+│   ├── MatrixConfig.swift         # Configuration constants
+│   ├── MatrixColumn.swift         # Falling column logic
 │   ├── MatrixDigitalRainView.swift  # Main screensaver view
-│   └── Info.plist               # Bundle metadata
+│   └── Info.plist                 # Bundle metadata
 ├── MatrixDigitalRainTests/      # Unit tests
+├── preview.swift                # Standalone preview for screen recording
 ├── docs/                        # GitHub Pages website
 └── .github/workflows/           # CI/CD
+```
+
+### Preview (for screen recording)
+
+macOS stops the screen saver when you start a screen recording. Use the preview script to run the effect in a regular fullscreen window that you can record:
+
+```bash
+# Build first, then run the preview
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain \
+  -configuration Release \
+  -derivedDataPath build \
+  build
+
+swift preview.swift
+```
+
+Use **Cmd+Shift+5** to record the window, then **Cmd+Q** to quit. Convert to GIF:
+
+```bash
+ffmpeg -i recording.mov -vf "fps=15,scale=960:-1" -loop 0 docs/matrix_preview.gif
 ```
 
 ### Build Commands

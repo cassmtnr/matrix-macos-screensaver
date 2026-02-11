@@ -16,6 +16,7 @@
 		A10000000000000000000009 /* MatrixDigitalRainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000013 /* MatrixDigitalRainView.swift */; };
 		A10000000000000000000006 /* MatrixConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* MatrixConfig.swift */; };
 		A10000000000000000000007 /* MatrixColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* MatrixColumn.swift */; };
+		A1000000000000000000000A /* Matrix-Code.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* Matrix-Code.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +34,7 @@
 		A10000000000000000000012 /* MatrixColumn.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixColumn.swift; sourceTree = "<group>"; };
 		A10000000000000000000013 /* MatrixDigitalRainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixDigitalRainView.swift; sourceTree = "<group>"; };
 		A10000000000000000000014 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A10000000000000000000015 /* Matrix-Code.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Matrix-Code.ttf"; sourceTree = "<group>"; };
 		A10000000000000000000021 /* MatrixConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixConfigTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000022 /* MatrixColumnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixColumnTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000023 /* MatrixDigitalRainViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixDigitalRainViewTests.swift; sourceTree = "<group>"; };
@@ -74,6 +76,7 @@
 				A10000000000000000000012 /* MatrixColumn.swift */,
 				A10000000000000000000013 /* MatrixDigitalRainView.swift */,
 				A10000000000000000000014 /* Info.plist */,
+				A10000000000000000000015 /* Matrix-Code.ttf */,
 			);
 			path = MatrixDigitalRain;
 			sourceTree = "<group>";
@@ -178,6 +181,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A1000000000000000000000A /* Matrix-Code.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
