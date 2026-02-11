@@ -43,6 +43,30 @@ final class MatrixConfigTests: XCTestCase {
         XCTAssertEqual(MatrixConfig.startDelay, 4.20 / 2)
     }
 
+    func testIntroConfigValues() {
+        // Lines are non-empty strings
+        XCTAssertFalse(MatrixConfig.introLines.isEmpty)
+        for line in MatrixConfig.introLines {
+            XCTAssertFalse(line.isEmpty, "Intro line should not be empty")
+        }
+
+        // Timing values are positive
+        XCTAssertGreaterThan(MatrixConfig.introInitialDelay, 0)
+        XCTAssertGreaterThan(MatrixConfig.introTypingSpeed, 0)
+        XCTAssertGreaterThanOrEqual(MatrixConfig.introTypingJitter, 0)
+        XCTAssertGreaterThan(MatrixConfig.introCursorBlinkRate, 0)
+
+        // Pause durations match number of lines
+        XCTAssertEqual(MatrixConfig.introPauseDurations.count, MatrixConfig.introLines.count)
+        for duration in MatrixConfig.introPauseDurations {
+            XCTAssertGreaterThan(duration, 0, "Pause duration should be positive")
+        }
+
+        // Font size is reasonable
+        XCTAssertGreaterThan(MatrixConfig.introFontSize, 0)
+        XCTAssertLessThanOrEqual(MatrixConfig.introFontSize, 48)
+    }
+
     func testColumnWidthGreaterThanOrEqualToFontSize() {
         XCTAssertGreaterThanOrEqual(MatrixConfig.columnWidth, MatrixConfig.fontSize)
     }

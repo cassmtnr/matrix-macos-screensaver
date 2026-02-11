@@ -17,6 +17,9 @@
 		A10000000000000000000006 /* MatrixConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000011 /* MatrixConfig.swift */; };
 		A10000000000000000000007 /* MatrixColumn.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000012 /* MatrixColumn.swift */; };
 		A1000000000000000000000A /* Matrix-Code.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000015 /* Matrix-Code.ttf */; };
+		A1000000000000000000000B /* IntroSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* IntroSequence.swift */; };
+		A1000000000000000000000C /* IntroSequence.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000016 /* IntroSequence.swift */; };
+		A1000000000000000000000D /* IntroSequenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A10000000000000000000024 /* IntroSequenceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -38,6 +41,8 @@
 		A10000000000000000000021 /* MatrixConfigTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixConfigTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000022 /* MatrixColumnTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixColumnTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000023 /* MatrixDigitalRainViewTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatrixDigitalRainViewTests.swift; sourceTree = "<group>"; };
+		A10000000000000000000016 /* IntroSequence.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroSequence.swift; sourceTree = "<group>"; };
+		A10000000000000000000024 /* IntroSequenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IntroSequenceTests.swift; sourceTree = "<group>"; };
 		A10000000000000000000041 /* Matrix Digital Rain.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Matrix Digital Rain.saver"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A10000000000000000000051 /* MatrixDigitalRainTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MatrixDigitalRainTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -74,6 +79,7 @@
 			children = (
 				A10000000000000000000011 /* MatrixConfig.swift */,
 				A10000000000000000000012 /* MatrixColumn.swift */,
+				A10000000000000000000016 /* IntroSequence.swift */,
 				A10000000000000000000013 /* MatrixDigitalRainView.swift */,
 				A10000000000000000000014 /* Info.plist */,
 				A10000000000000000000015 /* Matrix-Code.ttf */,
@@ -86,6 +92,7 @@
 			children = (
 				A10000000000000000000021 /* MatrixConfigTests.swift */,
 				A10000000000000000000022 /* MatrixColumnTests.swift */,
+				A10000000000000000000024 /* IntroSequenceTests.swift */,
 				A10000000000000000000023 /* MatrixDigitalRainViewTests.swift */,
 			);
 			path = MatrixDigitalRainTests;
@@ -201,6 +208,7 @@
 			files = (
 				A10000000000000000000001 /* MatrixConfig.swift in Sources */,
 				A10000000000000000000002 /* MatrixColumn.swift in Sources */,
+				A1000000000000000000000B /* IntroSequence.swift in Sources */,
 				A10000000000000000000003 /* MatrixDigitalRainView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -211,9 +219,11 @@
 			files = (
 				A10000000000000000000006 /* MatrixConfig.swift in Sources */,
 				A10000000000000000000007 /* MatrixColumn.swift in Sources */,
+				A1000000000000000000000C /* IntroSequence.swift in Sources */,
 				A10000000000000000000009 /* MatrixDigitalRainView.swift in Sources */,
 				A10000000000000000000004 /* MatrixConfigTests.swift in Sources */,
 				A10000000000000000000005 /* MatrixColumnTests.swift in Sources */,
+				A1000000000000000000000D /* IntroSequenceTests.swift in Sources */,
 				A10000000000000000000008 /* MatrixDigitalRainViewTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
