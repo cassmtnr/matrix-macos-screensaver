@@ -62,29 +62,45 @@ open build/Build/Products/Release/MatrixDigitalRain.saver
 MatrixDigitalRain/
 ├── MatrixDigitalRain.xcodeproj/
 ├── MatrixDigitalRain/
-│   ├── Matrix-Code.ttf            # Custom Matrix font (57 glyphs)
-│   ├── MatrixConfig.swift         # Configuration constants
-│   ├── MatrixColumn.swift         # Falling column logic
+│   ├── Matrix-Code.ttf              # Custom Matrix font (57 glyphs)
+│   ├── MatrixConfig.swift           # Configuration constants
+│   ├── MatrixColumn.swift           # Falling column logic
 │   ├── MatrixDigitalRainView.swift  # Main screensaver view
-│   └── Info.plist                 # Bundle metadata
-├── MatrixDigitalRainTests/      # Unit tests
-├── preview.swift                # Standalone preview script
-├── docs/                        # GitHub Pages website
-└── .github/workflows/           # CI/CD
+│   └── Info.plist                   # Bundle metadata
+├── MatrixDigitalRainTests/          # Unit tests
+├── preview.swift                    # Interactive preview (opens a window)
+├── generate_preview.swift           # Headless GIF generator (for CI)
+├── docs/                            # GitHub Pages website
+└── .github/workflows/               # CI/CD (build, test, release, preview)
 ```
 
 ### Preview
 
 ```bash
-# Build first, then run the preview
+# Build first
 xcodebuild -project MatrixDigitalRain.xcodeproj \
   -scheme MatrixDigitalRain \
   -configuration Release \
   -derivedDataPath build \
   build
 
+# Interactive preview (opens a fullscreen window, Cmd+Q to quit)
 swift preview.swift
+swift preview.swift --duration 20   # auto-quit after 20 seconds
 ```
+
+### Generate Preview GIF
+
+Generate an optimized GIF from an offscreen render — no screen recording permission needed. Works in CI.
+
+```bash
+# Requires ffmpeg: brew install ffmpeg
+swift generate_preview.swift
+swift generate_preview.swift --duration 12 --skip 6 --output docs/matrix_preview.gif
+swift generate_preview.swift --help   # see all options
+```
+
+The [Generate Preview](.github/workflows/generate-preview.yml) workflow runs this automatically on releases and commits the GIF to the repo.
 
 ### Build Commands
 

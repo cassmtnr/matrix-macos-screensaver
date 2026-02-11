@@ -36,14 +36,15 @@ final class MatrixConfigTests: XCTestCase {
     }
 
     func testConfigValues() {
-        XCTAssertEqual(MatrixConfig.fontSize, 30)
+        XCTAssertEqual(MatrixConfig.fontSize, 20)
         XCTAssertEqual(MatrixConfig.fps, 30)
         XCTAssertLessThan(MatrixConfig.minSpeed, MatrixConfig.maxSpeed)
         XCTAssertLessThan(MatrixConfig.minTrailLength, MatrixConfig.maxTrailLength)
+        XCTAssertEqual(MatrixConfig.startDelay, 4.20 / 2)
     }
 
-    func testColumnWidthSmallerThanOrEqualToFontSize() {
-        XCTAssertLessThanOrEqual(MatrixConfig.columnWidth, MatrixConfig.fontSize)
+    func testColumnWidthGreaterThanOrEqualToFontSize() {
+        XCTAssertGreaterThanOrEqual(MatrixConfig.columnWidth, MatrixConfig.fontSize)
     }
 
     func testAllConfigValuesPositive() {
