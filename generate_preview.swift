@@ -158,12 +158,36 @@ for frameNum in 0..<totalFrames {
 
     // After skip period, capture every Nth frame
     if frameNum >= skipFrames && (frameNum - skipFrames) % frameCaptureInterval == 0 {
-        guard let bitmap = saverView.bitmapImageRepForCachingDisplay(in: saverView.bounds) else {
-            print("Warning: Failed to create bitmap for frame \(frameNum)")
+        // Render to an explicit 1x CGContext to avoid Retina 2x scaling issues
+        let width = renderWidth
+        let height = renderHeight
+        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        guard let ctx = CGContext(
+            data: nil,
+            width: width,
+            height: height,
+            bitsPerComponent: 8,
+            bytesPerRow: width * 4,
+            space: colorSpace,
+            bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
+        ) else {
+            print("Warning: Failed to create CGContext for frame \(frameNum)")
             continue
         }
-        saverView.cacheDisplay(in: saverView.bounds, to: bitmap)
 
+        // Draw the view into our 1x context
+        NSGraphicsContext.saveGraphicsState()
+        let nsCtx = NSGraphicsContext(cgContext: ctx, flipped: false)
+        NSGraphicsContext.current = nsCtx
+        saverView.draw(saverView.bounds)
+        NSGraphicsContext.restoreGraphicsState()
+
+        guard let cgImage = ctx.makeImage() else {
+            print("Warning: Failed to create CGImage for frame \(frameNum)")
+            continue
+        }
+
+        let bitmap = NSBitmapImageRep(cgImage: cgImage)
         guard let pngData = bitmap.representation(using: .png, properties: [:]) else {
             print("Warning: Failed to create PNG data for frame \(frameNum)")
             continue
@@ -214,7 +238,7 @@ guard runFFmpeg([
     "-y",
     "-framerate", String(gifFps),
     "-i", inputPattern,
-    "-vf", "scale=\(gifWidth):-1:flags=lanczos,palettegen=max_colors=256:stats_mode=full",
+    "-vf", "crop=\(renderWidth/2):\(renderHeight/2):0:0,scale=\(gifWidth):-1:flags=lanczos,palettegen=max_colors=256:stats_mode=full",
     palette,
     "-loglevel", "warning"
 ]) else {
@@ -229,7 +253,7 @@ guard runFFmpeg([
     "-framerate", String(gifFps),
     "-i", inputPattern,
     "-i", palette,
-    "-filter_complex", "[0:v]scale=\(gifWidth):-1:flags=lanczos[s];[s][1:v]paletteuse=dither=sierra2_4a",
+    "-filter_complex", "[0:v]crop=\(renderWidth/2):\(renderHeight/2):0:0,scale=\(gifWidth):-1:flags=lanczos[s];[s][1:v]paletteuse=dither=sierra2_4a",
     output,
     "-loglevel", "warning"
 ]) else {
