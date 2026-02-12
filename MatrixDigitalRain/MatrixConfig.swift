@@ -1,45 +1,105 @@
 import Foundation
 
-struct MatrixConfig {
+/// Central configuration for the Matrix Digital Rain screensaver.
+/// All tunable constants live here for easy adjustment.
+///
+/// Uses a caseless `enum` instead of a `struct` to prevent accidental
+/// instantiation — this is a pure namespace for static constants.
+enum MatrixConfig {
+
+    // MARK: - Rain rendering
+
     static let fontSize: CGFloat = 20
     static let columnWidth: CGFloat = 24
-    static let charChangeProb: Double = 0.02
     static let fps: Double = 30
+
+    /// Probability that any single character mutates on a given frame,
+    /// creating the "glitch" effect. Applied independently to each cell.
+    static let perCellMutationChance: Double = 0.02
+
+    /// Brightness threshold at which a character is rendered as white (the "head").
+    /// Slightly below 1.0 to account for floating-point imprecision in trail calculations.
+    static let headBrightnessThreshold: Double = 0.95
+
+    /// Extra rows beyond the visible area, so trails starting above the
+    /// screen have character data ready before they scroll into view.
+    static let offScreenRowBuffer: Int = 5
+
+    // MARK: - Column behavior
+
     static let minTrailLength: Int = 10
     static let maxTrailLength: Int = 31
     static let minSpeed: Double = 0.05
     static let maxSpeed: Double = 0.50
-    static let startDelay: Double = 2
-    static let maxColumnStaggerFrames: Int = 90  // ~3 seconds at 30fps
 
-    // Intro sequence ("Wake up, Neo...")
-    static let introInitialDelay: Double = 2.0   // blinking cursor before first line (seconds)
-    private static var userName: String {
-        let full = NSFullUserName()
-        let firstName = full.components(separatedBy: " ").first ?? ""
+    /// Maximum random delay (in seconds) before a column starts falling.
+    /// Creates the staggered "wave" effect when the rain begins.
+    static let maxColumnStaggerDelay: Double = 3.0
+
+    // MARK: - Intro sequence ("Wake up, Neo...")
+
+    /// Configuration for a single intro line.
+    struct IntroLine {
+        /// The text to display.
+        let text: String
+        /// Seconds to pause after this line finishes typing.
+        let pauseDuration: Double
+        /// If `true`, the line appears all at once instead of being typed.
+        let appearsInstantly: Bool
+    }
+
+    /// Seconds the blinking cursor is shown before the first line starts typing.
+    static let introInitialDelay: Double = 2.0
+
+    /// The user's first name, used to personalize intro lines.
+    /// Falls back to "Neo" if the system username is unavailable.
+    private static let userName: String = {
+        let fullName = NSFullUserName()
+        let firstName = fullName.components(separatedBy: " ").first ?? ""
         return firstName.isEmpty ? "Neo" : firstName
-    }
-    static var introLines: [String] {
-        [
-            "Wake up, \(userName)...",
-            "The Matrix has you...",
-            "Follow the white rabbit.",
-            "Knock, knock, \(userName).",
-        ]
-    }
-    static let introInstantLines: Set<Int> = [3]   // line indices that appear all at once (no typing)
-    static let introTypingSpeed: Double = 0.1      // 100ms per character
-    static let introTypingJitter: Double = 0.03    // ±30ms randomness
-    static let introPauseDurations: [Double] = [1.5, 1.5, 1.5, 1.5]  // pause after each line
-    static let introCursorBlinkRate: Double = 0.42  // cursor blink interval (seconds)
-    static let introFontSize: CGFloat = 18          // smaller terminal-style font
+    }()
 
-    // Character set: all 57 printable glyphs from Matrix-Code.ttf
+    /// The lines displayed during the intro sequence.
+    /// Each line defines its text, pause duration, and whether it types or appears instantly.
+    static let introLines: [IntroLine] = [
+        IntroLine(text: "Wake up, \(userName)...",       pauseDuration: 1.5, appearsInstantly: false),
+        IntroLine(text: "The Matrix has you...",          pauseDuration: 1.5, appearsInstantly: false),
+        IntroLine(text: "Follow the white rabbit.",       pauseDuration: 1.5, appearsInstantly: false),
+        IntroLine(text: "Knock, knock, \(userName).",     pauseDuration: 1.5, appearsInstantly: true),
+    ]
+
+    /// Seconds between each typed character.
+    static let introTypingSpeed: Double = 0.1
+
+    /// Random jitter added to typing speed (±seconds) for a natural feel.
+    static let introTypingJitter: Double = 0.03
+
+    /// Cursor blink interval in seconds.
+    static let introCursorBlinkRate: Double = 0.42
+
+    /// Font size for the intro text (smaller than rain for a terminal feel).
+    static let introFontSize: CGFloat = 18
+
+    /// Padding from screen edges for intro text (terminal-style positioning).
+    static let introPadding: CGFloat = 40
+
+    /// Line height multiplier for intro text (relative to font size).
+    static let introLineHeightMultiplier: CGFloat = 1.4
+
+    // MARK: - Character set
+
+    /// All 57 printable glyphs from the Matrix-Code.ttf custom font.
+    /// Includes mirrored katakana, digits, and symbols from the films.
     static let matrixChars: [Character] = Array(
         "モエヤキオカ7ケサスz152ヨタワ4ネヌナ98ヒ0ホア3ウセ¦:\"꞊ミラリ╌ツテニハソ▪コシマムメー©*+<>|\u{E937}"
     )
 
+    /// Returns a random character from the Matrix character set.
+    /// - Precondition: `matrixChars` must not be empty.
     static func randomChar() -> Character {
-        matrixChars[Int.random(in: 0..<matrixChars.count)]
+        guard let char = matrixChars.randomElement() else {
+            fatalError("matrixChars is empty — the character set must contain at least one glyph")
+        }
+        return char
     }
 }

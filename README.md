@@ -6,7 +6,7 @@
 [![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy_Me_A_Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/cassmtnr)
 
-A Matrix-style "digital rain" screensaver for macOS featuring the iconic intro sequence and real-time rendered falling green characters.
+A Matrix-style screensaver for macOS with a personalized intro sequence and real-time falling green characters.
 
 <p align="center">
   <img src="docs/matrix_preview.gif" alt="Matrix Rain Preview" width="100%">
@@ -14,30 +14,24 @@ A Matrix-style "digital rain" screensaver for macOS featuring the iconic intro s
 
 ## Features
 
-- **Iconic intro sequence** - "Wake up, Neo..." typed character by character with blinking cursor, followed by "The Matrix has you...", "Follow the white rabbit.", and "Knock, knock, Neo." — just like the film
-- **Authentic Matrix effect** - Falling characters with glowing heads and fading trails
-- **Matrix-Code font** - 57 custom glyphs from the Matrix films (mirrored katakana, digits, symbols)
-- **Real-time rendering** - Core Text glyph rendering, no video files
-- **Multi-display** - Works across all connected screens
-- **Performance optimized** - Pre-cached glyph rendering, zero allocations per frame
-- **Adaptive** - Automatically scales to any screen resolution
-- **Infinite duration** - No looping, runs forever
+- **Personalized intro** — "Wake up, _\<your name\>_..." typed with a blinking cursor, using your Mac username
+- **Authentic digital rain** — Matrix-Code font with 57 custom glyphs, glowing white heads and fading green trails
+- **Frame-rate independent** — wall-clock timing for the intro, delta-time for the rain. Consistent speed at any FPS
+- **Multi-display & adaptive** — scales to any screen resolution across all connected displays
 
 ## Installation
 
-### Download (Recommended)
+### Download
 
 1. Download `MatrixDigitalRain.saver.zip` from [Releases](https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest)
-2. Unzip the file
-3. Remove the quarantine attribute (macOS blocks unsigned downloads):
+2. Unzip and remove quarantine (quarantine is applied as it's not a signed app):
    ```bash
    xattr -cr ~/Downloads/MatrixDigitalRain.saver
    ```
-4. Double-click `MatrixDigitalRain.saver`
-5. Choose **Install for This User Only** or **Install for All Users**
-6. Open **System Settings** > **Screen Saver** and select **Matrix Digital Rain**
+3. Double-click `MatrixDigitalRain.saver` to install
+4. Select it in **System Settings > Screen Saver**
 
-### Build from Source
+### Build from Source (no quarantine applied as you're the developer)
 
 ```bash
 git clone https://github.com/cassmtnr/matrix-macos-screensaver.git
@@ -49,88 +43,43 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
   -derivedDataPath build \
   build
 
-# Install
 open build/Build/Products/Release/MatrixDigitalRain.saver
 ```
 
-## Requirements
-
-- macOS 11.0 (Big Sur) or later
+Requires macOS 11.0+.
 
 ## Development
+
+```bash
+# Build
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Release \
+  -derivedDataPath build build
+
+# Preview (Cmd+Q to quit)
+swift preview.swift
+swift preview.swift --duration 30
+
+# Tests
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Debug test
+
+# Generate preview GIF (requires ffmpeg)
+swift generate_preview.swift --help
+```
 
 ### Project Structure
 
 ```
 MatrixDigitalRain/
-├── MatrixDigitalRain.xcodeproj/
-├── MatrixDigitalRain/
-│   ├── Matrix-Code.ttf              # Custom Matrix font (57 glyphs)
-│   ├── MatrixConfig.swift           # Configuration constants
-│   ├── MatrixColumn.swift           # Falling column logic
-│   ├── IntroSequence.swift          # "Wake up, Neo..." intro state machine
-│   ├── MatrixDigitalRainView.swift  # Main screensaver view
-│   └── Info.plist                   # Bundle metadata
-├── MatrixDigitalRainTests/          # Unit tests
-├── preview.swift                    # Interactive preview (opens a window)
-├── generate_preview.swift           # Headless GIF generator (for CI)
-├── docs/                            # GitHub Pages website
-└── .github/workflows/               # CI/CD (build, test, release, preview)
+├── MatrixConfig.swift           # All tunable constants
+├── MatrixColumn.swift           # Single falling column logic
+├── IntroSequence.swift          # "Wake up..." intro state machine
+├── MatrixDigitalRainView.swift  # Main ScreenSaverView subclass
+├── Matrix-Code.ttf              # Custom font (57 glyphs)
+└── Info.plist
 ```
-
-### Preview
-
-```bash
-# Build first
-xcodebuild -project MatrixDigitalRain.xcodeproj \
-  -scheme MatrixDigitalRain \
-  -configuration Release \
-  -derivedDataPath build \
-  build
-
-# Interactive preview (opens a fullscreen window, Cmd+Q to quit)
-swift preview.swift
-swift preview.swift --duration 20   # auto-quit after 20 seconds
-```
-
-### Generate Preview GIF
-
-Generate an optimized GIF from an offscreen render — no screen recording permission needed. Works in CI.
-
-```bash
-# Requires ffmpeg: brew install ffmpeg
-swift generate_preview.swift
-swift generate_preview.swift --duration 12 --skip 6 --output docs/matrix_preview.gif
-swift generate_preview.swift --help   # see all options
-```
-
-The [Release](.github/workflows/release.yml) workflow runs this automatically on releases and commits the GIF to the repo.
-
-### Build Commands
-
-```bash
-# Build Release
-xcodebuild -project MatrixDigitalRain.xcodeproj \
-  -scheme MatrixDigitalRain \
-  -configuration Release \
-  -derivedDataPath build \
-  build
-
-# Run Tests
-xcodebuild -project MatrixDigitalRain.xcodeproj \
-  -scheme MatrixDigitalRain \
-  -configuration Debug \
-  test
-
-# Clean
-xcodebuild -project MatrixDigitalRain.xcodeproj clean
-rm -rf build/
-```
-
-## Contributing
-
-Contributions are welcome. Please open an issue or submit a pull request.
 
 ## License
 
-MIT License - feel free to use, modify, and distribute.
+MIT

@@ -45,24 +45,59 @@ func printUsage() {
     """)
 }
 
+/// Reads the next CLI argument value for the given flag, or exits with an error.
+func requireArgValue(after index: Int, for flag: String) -> String {
+    let valueIndex = index + 1
+    guard valueIndex < CommandLine.arguments.count else {
+        print("Error: \(flag) requires a value")
+        printUsage()
+        exit(1)
+    }
+    return CommandLine.arguments[valueIndex]
+}
+
+/// Parses a string as a Double, or exits with an error.
+func parseDouble(_ value: String, for flag: String) -> Double {
+    guard let result = Double(value) else {
+        print("Error: \(flag) expects a number, got '\(value)'")
+        exit(1)
+    }
+    return result
+}
+
+/// Parses a string as an Int, or exits with an error.
+func parseInt(_ value: String, for flag: String) -> Int {
+    guard let result = Int(value) else {
+        print("Error: \(flag) expects an integer, got '\(value)'")
+        exit(1)
+    }
+    return result
+}
+
 var argIndex = 1
 while argIndex < CommandLine.arguments.count {
     let arg = CommandLine.arguments[argIndex]
     switch arg {
     case "--duration":
-        argIndex += 1; duration = Double(CommandLine.arguments[argIndex])!
+        let val = requireArgValue(after: argIndex, for: arg); argIndex += 1
+        duration = parseDouble(val, for: arg)
     case "--skip":
-        argIndex += 1; skip = Double(CommandLine.arguments[argIndex])!
+        let val = requireArgValue(after: argIndex, for: arg); argIndex += 1
+        skip = parseDouble(val, for: arg)
     case "--gif-width":
-        argIndex += 1; gifWidth = Int(CommandLine.arguments[argIndex])!
+        let val = requireArgValue(after: argIndex, for: arg); argIndex += 1
+        gifWidth = parseInt(val, for: arg)
     case "--gif-fps":
-        argIndex += 1; gifFps = Int(CommandLine.arguments[argIndex])!
+        let val = requireArgValue(after: argIndex, for: arg); argIndex += 1
+        gifFps = parseInt(val, for: arg)
     case "--render-width":
-        argIndex += 1; renderWidth = Int(CommandLine.arguments[argIndex])!
+        let val = requireArgValue(after: argIndex, for: arg); argIndex += 1
+        renderWidth = parseInt(val, for: arg)
     case "--render-height":
-        argIndex += 1; renderHeight = Int(CommandLine.arguments[argIndex])!
+        let val = requireArgValue(after: argIndex, for: arg); argIndex += 1
+        renderHeight = parseInt(val, for: arg)
     case "--output":
-        argIndex += 1; output = CommandLine.arguments[argIndex]
+        output = requireArgValue(after: argIndex, for: arg); argIndex += 1
     case "--help":
         printUsage()
         exit(0)

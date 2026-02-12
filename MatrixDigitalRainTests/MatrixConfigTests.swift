@@ -2,6 +2,9 @@ import XCTest
 @testable import MatrixDigitalRain
 
 final class MatrixConfigTests: XCTestCase {
+
+    // MARK: - Character set
+
     func testRandomCharReturnsValidCharacter() {
         for _ in 0..<100 {
             let char = MatrixConfig.randomChar()
@@ -35,36 +38,14 @@ final class MatrixConfigTests: XCTestCase {
         }
     }
 
+    // MARK: - Rain config values
+
     func testConfigValues() {
         XCTAssertEqual(MatrixConfig.fontSize, 20)
         XCTAssertEqual(MatrixConfig.fps, 30)
         XCTAssertLessThan(MatrixConfig.minSpeed, MatrixConfig.maxSpeed)
         XCTAssertLessThan(MatrixConfig.minTrailLength, MatrixConfig.maxTrailLength)
-        XCTAssertEqual(MatrixConfig.startDelay, 2)
-    }
-
-    func testIntroConfigValues() {
-        // Lines are non-empty strings
-        XCTAssertFalse(MatrixConfig.introLines.isEmpty)
-        for line in MatrixConfig.introLines {
-            XCTAssertFalse(line.isEmpty, "Intro line should not be empty")
-        }
-
-        // Timing values are positive
-        XCTAssertGreaterThan(MatrixConfig.introInitialDelay, 0)
-        XCTAssertGreaterThan(MatrixConfig.introTypingSpeed, 0)
-        XCTAssertGreaterThanOrEqual(MatrixConfig.introTypingJitter, 0)
-        XCTAssertGreaterThan(MatrixConfig.introCursorBlinkRate, 0)
-
-        // Pause durations match number of lines
-        XCTAssertEqual(MatrixConfig.introPauseDurations.count, MatrixConfig.introLines.count)
-        for duration in MatrixConfig.introPauseDurations {
-            XCTAssertGreaterThan(duration, 0, "Pause duration should be positive")
-        }
-
-        // Font size is reasonable
-        XCTAssertGreaterThan(MatrixConfig.introFontSize, 0)
-        XCTAssertLessThanOrEqual(MatrixConfig.introFontSize, 48)
+        XCTAssertGreaterThan(MatrixConfig.maxColumnStaggerDelay, 0)
     }
 
     func testColumnWidthGreaterThanOrEqualToFontSize() {
@@ -81,13 +62,48 @@ final class MatrixConfigTests: XCTestCase {
         XCTAssertGreaterThan(MatrixConfig.maxTrailLength, 0)
     }
 
-    func testCharChangeProbIsValid() {
-        XCTAssertGreaterThanOrEqual(MatrixConfig.charChangeProb, 0)
-        XCTAssertLessThanOrEqual(MatrixConfig.charChangeProb, 1)
+    func testPerCellMutationChanceIsValid() {
+        XCTAssertGreaterThanOrEqual(MatrixConfig.perCellMutationChance, 0)
+        XCTAssertLessThanOrEqual(MatrixConfig.perCellMutationChance, 1)
+    }
+
+    func testHeadBrightnessThresholdIsValid() {
+        XCTAssertGreaterThan(MatrixConfig.headBrightnessThreshold, 0)
+        XCTAssertLessThanOrEqual(MatrixConfig.headBrightnessThreshold, 1)
     }
 
     func testFpsIsReasonable() {
         XCTAssertGreaterThan(MatrixConfig.fps, 0)
         XCTAssertLessThanOrEqual(MatrixConfig.fps, 120)
+    }
+
+    // MARK: - Intro config values
+
+    func testIntroConfigValues() {
+        // Lines are non-empty
+        XCTAssertFalse(MatrixConfig.introLines.isEmpty)
+        for line in MatrixConfig.introLines {
+            XCTAssertFalse(line.text.isEmpty, "Intro line text should not be empty")
+            XCTAssertGreaterThan(line.pauseDuration, 0, "Pause duration should be positive")
+        }
+
+        // Timing values are positive
+        XCTAssertGreaterThan(MatrixConfig.introInitialDelay, 0)
+        XCTAssertGreaterThan(MatrixConfig.introTypingSpeed, 0)
+        XCTAssertGreaterThanOrEqual(MatrixConfig.introTypingJitter, 0)
+        XCTAssertGreaterThan(MatrixConfig.introCursorBlinkRate, 0)
+
+        // Layout values are positive
+        XCTAssertGreaterThan(MatrixConfig.introPadding, 0)
+        XCTAssertGreaterThan(MatrixConfig.introLineHeightMultiplier, 0)
+
+        // Font size is reasonable
+        XCTAssertGreaterThan(MatrixConfig.introFontSize, 0)
+        XCTAssertLessThanOrEqual(MatrixConfig.introFontSize, 48)
+    }
+
+    func testIntroLinesContainAtLeastOneInstantLine() {
+        let hasInstant = MatrixConfig.introLines.contains { $0.appearsInstantly }
+        XCTAssertTrue(hasInstant, "At least one intro line should appear instantly")
     }
 }
