@@ -14,12 +14,19 @@ struct MatrixConfig {
 
     // Intro sequence ("Wake up, Neo...")
     static let introInitialDelay: Double = 2.0   // blinking cursor before first line (seconds)
-    static let introLines: [String] = [
-        "Wake up, Neo...",          // 15 chars → 2.25s typing + 1.5s pause
-        "The Matrix has you...",    // 21 chars → 3.15s typing + 1.5s pause
-        "Follow the white rabbit.", // 24 chars → 3.60s typing + 1.5s pause
-        "Knock, knock, Neo.",       // instant + 1.5s pause
-    ]
+    private static var userName: String {
+        let full = NSFullUserName()
+        let firstName = full.components(separatedBy: " ").first ?? ""
+        return firstName.isEmpty ? "Neo" : firstName
+    }
+    static var introLines: [String] {
+        [
+            "Wake up, \(userName)...",
+            "The Matrix has you...",
+            "Follow the white rabbit.",
+            "Knock, knock, \(userName).",
+        ]
+    }
     static let introInstantLines: Set<Int> = [3]   // line indices that appear all at once (no typing)
     static let introTypingSpeed: Double = 0.1      // 100ms per character
     static let introTypingJitter: Double = 0.03    // ±30ms randomness
