@@ -7,7 +7,7 @@ final class MatrixColumn {
     private(set) var headY: Double
     private(set) var speed: Double
     private(set) var trailLength: Int
-    private var remainingStartDelay: Int
+    private var remainingStartDelay: Double  // seconds
 
     init(columnIndex: Int, numRows: Int) {
         self.columnIndex = columnIndex
@@ -17,16 +17,19 @@ final class MatrixColumn {
         self.headY = -1
         self.speed = Double.random(in: MatrixConfig.minSpeed...MatrixConfig.maxSpeed)
         self.trailLength = Int.random(in: MatrixConfig.minTrailLength...MatrixConfig.maxTrailLength)
-        self.remainingStartDelay = Int.random(in: 0..<MatrixConfig.maxColumnStaggerFrames)
+        self.remainingStartDelay = Double.random(in: 0..<Double(MatrixConfig.maxColumnStaggerFrames) / MatrixConfig.fps)
     }
 
-    func update() {
+    /// Update column state. `deltaTime` is seconds since last frame.
+    func update(deltaTime: Double = 1.0 / MatrixConfig.fps) {
+        let timeScale = deltaTime * MatrixConfig.fps  // 1.0 at target fps
+
         if remainingStartDelay > 0 {
-            remainingStartDelay -= 1
+            remainingStartDelay -= deltaTime
             return
         }
 
-        headY += speed
+        headY += speed * timeScale
 
         // Reset when off screen
         if headY - Double(trailLength) > Double(numRows) {

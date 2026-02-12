@@ -19,8 +19,8 @@ import ScreenSaver
 
 var duration: Double = 30
 var skip: Double = 0
-var gifWidth: Int = 1280
-var gifFps: Int = 20
+var gifWidth: Int = 640
+var gifFps: Int = 15
 var renderWidth: Int = 1920
 var renderHeight: Int = 1080
 var output: String = "docs/matrix_preview.gif"

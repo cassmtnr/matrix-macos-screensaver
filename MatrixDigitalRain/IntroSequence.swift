@@ -49,16 +49,17 @@ class IntroSequence {
 
         case .typing(let lineIndex):
             let line = MatrixConfig.introLines[lineIndex]
-            if phaseElapsed >= nextCharTime {
+            // Type all characters whose time has passed (handles low frame rates)
+            while phaseElapsed >= nextCharTime && charIndex < line.count {
                 charIndex += 1
                 if charIndex >= line.count {
                     phase = .pause(lineIndex: lineIndex)
                     phaseStartTime = now
                     cursorVisible = true
                     lastCursorToggle = now
-                } else {
-                    nextCharTime = phaseElapsed + MatrixConfig.introTypingSpeed + randomJitter()
+                    break
                 }
+                nextCharTime += MatrixConfig.introTypingSpeed + randomJitter()
             }
 
         case .pause(let lineIndex):
