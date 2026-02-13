@@ -24,6 +24,7 @@ var gifFps: Int = 15
 var renderWidth: Int = 1920
 var renderHeight: Int = 1080
 var output: String = "docs/matrix_preview.gif"
+var introName: String = "Neo"
 
 func printUsage() {
     print("""
@@ -41,6 +42,7 @@ func printUsage() {
       --render-width PX    Render resolution width (default: \(renderWidth))
       --render-height PX   Render resolution height (default: \(renderHeight))
       --output PATH        Output GIF path (default: \(output))
+      --name NAME          Intro name override (default: \(introName))
       --help               Show this help message
     """)
 }
@@ -98,6 +100,8 @@ while argIndex < CommandLine.arguments.count {
         renderHeight = parseInt(val, for: arg)
     case "--output":
         output = requireArgValue(after: argIndex, for: arg); argIndex += 1
+    case "--name":
+        introName = requireArgValue(after: argIndex, for: arg); argIndex += 1
     case "--help":
         printUsage()
         exit(0)
@@ -108,6 +112,10 @@ while argIndex < CommandLine.arguments.count {
     }
     argIndex += 1
 }
+
+// ── Set intro name override (must happen before the bundle loads) ────────────────
+
+setenv("MATRIX_INTRO_NAME", introName, 1)
 
 // ── Load the screensaver bundle ─────────────────────────────────────────────────
 

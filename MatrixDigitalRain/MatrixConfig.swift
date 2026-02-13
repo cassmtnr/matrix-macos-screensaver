@@ -53,7 +53,12 @@ enum MatrixConfig {
 
     /// The user's first name, used to personalize intro lines.
     /// Falls back to "Neo" if the system username is unavailable.
+    /// Can be overridden via the `MATRIX_INTRO_NAME` environment variable
+    /// (used by generate_preview.swift to show "Neo" in the public GIF).
     private static let userName: String = {
+        if let override = ProcessInfo.processInfo.environment["MATRIX_INTRO_NAME"], !override.isEmpty {
+            return override
+        }
         let fullName = NSFullUserName()
         let firstName = fullName.components(separatedBy: " ").first ?? ""
         return firstName.isEmpty ? "Neo" : firstName
