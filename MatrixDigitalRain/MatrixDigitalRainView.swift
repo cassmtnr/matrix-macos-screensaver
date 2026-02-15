@@ -40,6 +40,12 @@ class MatrixDigitalRainView: ScreenSaverView {
     /// creating a new `CGColor` for every visible cell on every frame.
     private var greenPalette: [CGColor] = []
 
+    /// Green glow color for the phosphor bleed effect on rain characters.
+    private lazy var rainGlowColor: CGColor = {
+        CGColor(colorSpace: colorSpace, components: [0, 0.5, 0, 0.6])
+            ?? CGColor(red: 0, green: 0.5, blue: 0, alpha: 0.6)
+    }()
+
     // MARK: - Initialization
 
     override init?(frame: NSRect, isPreview: Bool) {
@@ -180,12 +186,17 @@ class MatrixDigitalRainView: ScreenSaverView {
         let fontSize = MatrixConfig.fontSize
         let boundsHeight = bounds.height
 
+        // Phosphor glow — one blur pass for all characters via transparency layer
+        context.saveGState()
+        context.setShadow(offset: .zero, blur: MatrixConfig.crtRainGlowRadius, color: rainGlowColor)
+        context.beginTransparencyLayer(auxiliaryInfo: nil)
+
         for column in columns {
             let baseX = CGFloat(column.columnIndex) * colWidth
 
             for row in 0..<numRows {
                 let brightness = column.brightness(atRow: row)
-                guard brightness > 0 else { continue }
+                guard brightness >= MatrixConfig.trailBrightnessCutoff else { continue }
 
                 let char = column.character(atRow: row)
                 guard var glyph = glyphCache[char] else { continue }
@@ -206,6 +217,9 @@ class MatrixDigitalRainView: ScreenSaverView {
                 CTFontDrawGlyphs(font, &glyph, &position, 1, context)
             }
         }
+
+        context.endTransparencyLayer()
+        context.restoreGState()
 
         drawScanlines(in: context)
     }
