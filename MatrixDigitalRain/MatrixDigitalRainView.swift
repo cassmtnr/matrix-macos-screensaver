@@ -206,6 +206,19 @@ class MatrixDigitalRainView: ScreenSaverView {
                 CTFontDrawGlyphs(font, &glyph, &position, 1, context)
             }
         }
+
+        drawScanlines(in: context)
+    }
+
+    private func drawScanlines(in context: CGContext) {
+        let spacing = MatrixConfig.crtScanlineSpacing
+        context.setFillColor(red: 0, green: 0, blue: 0, alpha: MatrixConfig.crtScanlineAlpha)
+        var y: CGFloat = 0
+        while y < bounds.height {
+            context.addRect(CGRect(x: 0, y: y, width: bounds.width, height: 1))
+            y += spacing
+        }
+        context.fillPath()
     }
 
     // MARK: - Configuration sheet (not used)

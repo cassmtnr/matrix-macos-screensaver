@@ -82,6 +82,20 @@ enum MatrixConfig {
     /// Cursor blink interval in seconds.
     static let introCursorBlinkRate: Double = 0.42
 
+    // MARK: - CRT monitor effects (intro only)
+
+    /// Background green intensity for the faint CRT phosphor glow.
+    static let crtBackgroundGlow: CGFloat = 0.02
+
+    /// Blur radius for the green phosphor glow around intro text.
+    static let crtGlowRadius: CGFloat = 15
+
+    /// Spacing in points between CRT scanlines.
+    static let crtScanlineSpacing: CGFloat = 3
+
+    /// Opacity of CRT scanlines (0 = invisible, 1 = fully opaque).
+    static let crtScanlineAlpha: CGFloat = 0.12
+
     /// Font size for the intro text (smaller than rain for a terminal feel).
     static let introFontSize: CGFloat = 18
 

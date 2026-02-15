@@ -28,6 +28,7 @@ final class IntroSequence {
 
     private let font: CTFont
     private let textColor: CGColor
+    private let glowColor: CGColor
 
     // MARK: - State
 
@@ -45,11 +46,10 @@ final class IntroSequence {
     // MARK: - Initialization
 
     init() {
+        let cs = CGColorSpaceCreateDeviceRGB()
         self.font = CTFontCreateWithName("Menlo" as CFString, MatrixConfig.introFontSize, nil)
-        self.textColor = CGColor(
-            colorSpace: CGColorSpaceCreateDeviceRGB(),
-            components: [0, 0.8, 0, 1]
-        )!
+        self.textColor = CGColor(colorSpace: cs, components: [0, 0.8, 0, 1])!
+        self.glowColor = CGColor(colorSpace: cs, components: [0, 0.6, 0, 0.7])!
     }
 
     // MARK: - Update (call once per frame from animateOneFrame)
@@ -107,31 +107,20 @@ final class IntroSequence {
 
     func draw(in context: CGContext, bounds: NSRect) {
         guard !isComplete else { return }
+        drawCRTBackground(in: context, bounds: bounds)
+        drawText(in: context, bounds: bounds)
+        drawScanlines(in: context, bounds: bounds)
+    }
 
-        // Determine what text to show based on current phase
-        let currentLine: String
-        let displayLength: Int
+    private func drawCRTBackground(in context: CGContext, bounds: NSRect) {
+        context.setFillColor(red: 0, green: MatrixConfig.crtBackgroundGlow, blue: 0, alpha: 1)
+        context.fill(bounds)
+    }
 
-        switch phase {
-        case .initialDelay:
-            currentLine = ""
-            displayLength = 0
-        case .typing(let lineIndex):
-            currentLine = MatrixConfig.introLines[lineIndex].text
-            displayLength = min(charIndex, currentLine.count)
-        case .pause(let lineIndex):
-            currentLine = MatrixConfig.introLines[lineIndex].text
-            displayLength = currentLine.count
-        case .done:
-            return
-        }
+    private func drawText(in context: CGContext, bounds: NSRect) {
+        let visibleText = buildDisplayText()
+        let displayText = visibleText + (cursorVisible ? "\u{2588}" : " ")
 
-        // Build visible text with blinking block cursor (█)
-        let visibleText = String(currentLine.prefix(displayLength))
-        let cursor: String = cursorVisible ? "\u{2588}" : " "
-        let displayText = visibleText + cursor
-
-        // Render with CoreText
         let attributes: [NSAttributedString.Key: Any] = [
             .font: font,
             .foregroundColor: NSColor(cgColor: textColor) ?? NSColor.green
@@ -139,14 +128,36 @@ final class IntroSequence {
         let attrString = NSAttributedString(string: displayText, attributes: attributes)
         let ctLine = CTLineCreateWithAttributedString(attrString)
 
-        // Position at top-left with padding (terminal style)
         let lineHeight = MatrixConfig.introFontSize * MatrixConfig.introLineHeightMultiplier
         let y = bounds.height - MatrixConfig.introPadding - lineHeight
 
         context.saveGState()
+        context.setShadow(offset: .zero, blur: MatrixConfig.crtGlowRadius, color: glowColor)
         context.textPosition = CGPoint(x: MatrixConfig.introPadding, y: y)
         CTLineDraw(ctLine, context)
         context.restoreGState()
+    }
+
+    private func buildDisplayText() -> String {
+        switch phase {
+        case .initialDelay, .done: return ""
+        case .typing(let i):
+            let text = MatrixConfig.introLines[i].text
+            return String(text.prefix(min(charIndex, text.count)))
+        case .pause(let i):
+            return MatrixConfig.introLines[i].text
+        }
+    }
+
+    private func drawScanlines(in context: CGContext, bounds: NSRect) {
+        let spacing = MatrixConfig.crtScanlineSpacing
+        context.setFillColor(red: 0, green: 0, blue: 0, alpha: MatrixConfig.crtScanlineAlpha)
+        var y: CGFloat = 0
+        while y < bounds.height {
+            context.addRect(CGRect(x: 0, y: y, width: bounds.width, height: 1))
+            y += spacing
+        }
+        context.fillPath()
     }
 
     // MARK: - Reset
