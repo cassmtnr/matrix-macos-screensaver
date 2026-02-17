@@ -1,105 +1,57 @@
 ---
 name: security
-description: Security best practices, secrets management, OWASP patterns
-globs:
-  - "**/*"
+description: Security patterns and secrets management for this stack
 ---
 
-# Security Best Practices
+# Security
 
-Security is not optional. Every project must pass security checks.
+## Gitignore Coverage
 
-## Required .gitignore Entries
+The `.gitignore` correctly excludes:
+- `build/` and `DerivedData/` — Xcode build artifacts
+- `*.xcuserstate` and `xcuserdata/` — Personal Xcode settings
+- `*.saver` — Built bundles (distributed via GitHub Releases)
+- `.ralph/` — Ralph orchestrator state
+- `default.profraw` — Profiling artifacts
 
-**NEVER commit these:**
+## Secrets to Watch For
 
-```gitignore
-# Environment files
-.env
-.env.*
-!.env.example
+This project has minimal secrets exposure, but watch for:
 
-# Secrets and credentials
-*.pem
-*.key
-*.p12
-credentials.json
-secrets.json
-*-credentials.json
-service-account*.json
+| Pattern | Risk | Location |
+|---------|------|----------|
+| `MATRIX_INTRO_NAME` | Low — only controls display name | `MatrixConfig.swift:59`, `generate_preview.swift:118` |
+| System username | Medium — `NSFullUserName()` is read at runtime | `MatrixConfig.swift:62-63` |
+| Bundle identifier | Low — public | `Info.plist`, `project.pbxproj` |
 
-# IDE secrets
-.idea/
-.vscode/settings.json
-```
+## Security Considerations
 
-## Environment Variables
+### Process-scoped font registration
+The custom font is registered with `.process` scope (`CTFontManagerRegisterFontsForURL`), meaning it's only available to the screensaver process and doesn't affect other applications. This is the correct approach.
 
-### Create .env.example
+### No network access
+The screensaver makes no network calls. It reads only:
+- The bundle's own font resource (`Matrix-Code.ttf`)
+- The system username (`NSFullUserName()`)
+- An optional environment variable (`MATRIX_INTRO_NAME`)
 
-Document required vars without values:
+### No user data persistence
+The screensaver does not write to disk, store preferences, or access the keychain. `hasConfigureSheet` returns `false`.
 
-```bash
-# Server-side only (never expose to client)
-DATABASE_URL=
-API_SECRET_KEY=
-ANTHROPIC_API_KEY=
+### Code signing
+The `.saver` bundle is **not code-signed**. Users must remove quarantine with `xattr -cr` after downloading. If code signing is added in the future:
+- Never commit signing certificates or provisioning profiles
+- Use Xcode automatic signing or CI-provided credentials
+- Add `*.p12`, `*.mobileprovision`, `*.certSigningRequest` to `.gitignore`
 
-# Client-side safe (public, non-sensitive)
-API_BASE_URL=
-```
+## OWASP Relevance
 
+Most OWASP Top 10 categories don't apply (no web server, no database, no user input). The primary concern is:
+- **A08: Software and Data Integrity** — The unsigned bundle is a trust concern. Users should verify the download hash or build from source.
 
+## Pre-Commit Checks
 
-### Validate at Startup
-
-
-
-
-## OWASP Top 10 Checklist
-
-| Vulnerability | Prevention |
-|---------------|------------|
-| Injection (SQL, NoSQL, Command) | Parameterized queries, input validation |
-| Broken Auth | Secure session management, MFA |
-| Sensitive Data Exposure | Encryption at rest and in transit |
-| XXE | Disable external entity processing |
-| Broken Access Control | Verify permissions on every request |
-| Security Misconfiguration | Secure defaults, minimal permissions |
-| XSS | Output encoding, CSP headers |
-| Insecure Deserialization | Validate all serialized data |
-| Using Vulnerable Components | Keep dependencies updated |
-| Insufficient Logging | Log security events, monitor |
-
-## Input Validation
-
-```
-RULE: Never trust user input. Validate everything.
-
-- Validate type, length, format, range
-- Sanitize before storage
-- Encode before output
-- Use allowlists over denylists
-```
-
-## Secrets Detection
-
-Before committing, check for:
-
-- API keys (usually 32+ chars, specific patterns)
-- Passwords in code
-- Connection strings with credentials
-- Private keys (BEGIN RSA/EC/PRIVATE KEY)
-- Tokens (jwt, bearer, oauth)
-
-## Security Review Checklist
-
-Before PR merge:
-
-- [ ] No secrets in code or config
-- [ ] Input validation on all user data
-- [ ] Output encoding where displayed
-- [ ] Authentication checked on protected routes
-- [ ] Authorization verified for resources
-- [ ] Dependencies scanned for vulnerabilities
-- [ ] Error messages don't leak internals
+Before committing, verify:
+- No hardcoded paths containing usernames (use `NSFullUserName()` or env vars)
+- No secrets in commit messages or comments
+- `.gitignore` covers any new build artifacts or generated files

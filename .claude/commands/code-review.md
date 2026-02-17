@@ -1,57 +1,58 @@
 ---
-allowed-tools: Read, Glob, Grep, Bash(git diff), Bash(git status), Bash(git log)
-description: Review code changes for quality, security, and best practices
+allowed-tools: ["Read", "Glob", "Grep", "Bash(git diff)", "Bash(git diff --cached)", "Bash(git status)"]
+description: "Review code changes for quality and security"
 ---
 
 # Code Review
 
-## Changes to Review
+Review current code changes for quality, consistency, and correctness.
 
-!git diff --stat HEAD~1 2>/dev/null || git diff --stat
+1. **Gather changes**:
+   - Run `git diff` for unstaged changes
+   - Run `git diff --cached` for staged changes
+   - Run `git status` for an overview
 
-## Review Process
+2. **Review each changed file** against these criteria:
 
-Analyze all changes for:
+   ### Critical (must fix)
+   - Per-frame allocations in `draw()` or `animateOneFrame()` hot paths
+   - Frame-count-based timing instead of `Date()` or delta-time
+   - Magic numbers not in `MatrixConfig`
+   - Missing `@objc(MatrixDigitalRainView)` or `NSPrincipalClass` mismatch
+   - Force-unwraps that could crash
 
-### 1. Security (Critical)
-- [ ] No secrets/credentials in code
-- [ ] Input validation present
-- [ ] Output encoding where needed
-- [ ] Auth/authz checks on protected routes
+   ### Warning (should fix)
+   - Missing `///` documentation on public API
+   - Missing `// MARK: -` sections
+   - Missing test coverage for new behavior
+   - Naming doesn't match conventions (PascalCase types, camelCase members)
+   - New constants not in `MatrixConfig`
 
-### 2. Quality
-- [ ] Functions ≤ 20 lines
-- [ ] Files ≤ 200 lines
-- [ ] No code duplication
-- [ ] Clear naming
-- [ ] Proper error handling
+   ### Suggestion (nice to have)
+   - Function exceeds 40 lines
+   - File exceeds 300 lines
+   - Comment describes "what" instead of "why"
+   - Opportunity to use `guard` for early return
 
-### 3. Testing
-- [ ] Tests exist for new code
-- [ ] Edge cases covered
-- [ ] Tests are meaningful (not just for coverage)
+3. **Output a structured review**:
 
-### 4. Style
-- [ ] Matches existing patterns
-- [ ] Consistent formatting
-- [ ] No commented-out code
+```
+## Code Review Summary
 
-## Output Format
+### Files Changed
+{list of files with change summary}
 
-For each finding, include file:line reference:
+### Issues Found
 
-### Critical (Must Fix)
-Issues that block merge
+#### Critical
+- {file}:{line} — {description}
 
-### Warning (Should Fix)
-Issues that should be addressed
+#### Warnings
+- {file}:{line} — {description}
 
-### Suggestion (Consider)
-Optional improvements
+#### Suggestions
+- {file}:{line} — {description}
 
-## Summary
-
-Provide:
-1. Overall assessment (Ready / Changes Needed / Not Ready)
-2. Count of findings by severity
-3. Top priorities to address
+### Verdict
+{APPROVE / REQUEST CHANGES / NEEDS DISCUSSION}
+```

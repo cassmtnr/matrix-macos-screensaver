@@ -1,77 +1,62 @@
 ---
 name: pattern-discovery
-description: Analyze existing codebase to discover and document patterns
-globs:
-  - "src/**/*"
-  - "lib/**/*"
-  - "app/**/*"
-  - "components/**/*"
-  - "pages/**/*"
-  - "api/**/*"
-  - "services/**/*"
+description: Analyze codebase to discover and document patterns
 ---
 
 # Pattern Discovery
 
-When starting work on a project, analyze the existing code to understand its patterns.
+Search the codebase to discover, verify, and document coding patterns before writing new code.
 
-## Discovery Process
+## Search Strategy
 
-### 1. Check for Existing Documentation
+1. **Source files**: Search `MatrixDigitalRain/*.swift` for implementation patterns
+2. **Test files**: Search `MatrixDigitalRainTests/*.swift` for testing patterns
+3. **Config**: Check `MatrixDigitalRain/MatrixConfig.swift` for constant organization
+4. **Scripts**: Check `preview.swift` and `generate_preview.swift` for standalone Swift patterns
 
-```
-Look for:
-- README.md, CONTRIBUTING.md
-- docs/ folder
-- Code comments and JSDoc/TSDoc
-- .editorconfig, .prettierrc, eslint config
-```
+## Key Patterns to Look For
 
-### 2. Analyze Project Structure
+### Architecture Patterns
+- Caseless enum namespaces for constants (`MatrixConfig`)
+- State machines with enum phases (`IntroSequence.Phase`)
+- `ScreenSaverView` subclass lifecycle (`init`, `startAnimation`, `animateOneFrame`, `draw`)
+- Pre-computed resource caching at initialization
 
-```
-Questions to answer:
-- How are files organized? (by feature, by type, flat?)
-- Where does business logic live?
-- Where are tests located?
-- How are configs managed?
-```
+### Code Organization
+- `// MARK: -` sections in every file (Properties, Initialization, Update, Draw, etc.)
+- `///` documentation comments on all public types and methods
+- One primary type per file, PascalCase filename matching type name
 
-### 3. Detect Code Patterns
+### Rendering Patterns
+- Direct `CGContext` drawing (no SwiftUI, no storyboards)
+- `CTFontDrawGlyphs` for glyph rendering
+- Transparency layers with shadow for glow effects
+- Pre-computed color palettes indexed by brightness
 
-```
-Look at 3-5 similar files to find:
-- Naming conventions (camelCase, snake_case, PascalCase)
-- Import organization (grouped? sorted? relative vs absolute?)
-- Export style (named, default, barrel files?)
-- Error handling approach
-- Logging patterns
-```
+### Timing Patterns
+- Wall-clock `Date()` for intro timing
+- Delta-time (`deltaTime: Double`) for rain animation
+- Never frame-count-based timing
 
-### 4. Identify Architecture
+## How to Search
 
 ```
-Common patterns to detect:
-- MVC / MVVM / Clean Architecture
-- Repository pattern
-- Service layer
-- Dependency injection
-- Event-driven
-- Functional vs OOP
+# Find all MARK sections to understand code organization
+grep -n "MARK:" MatrixDigitalRain/*.swift
+
+# Find all public API surfaces
+grep -n "func \|var \|let " MatrixDigitalRain/*.swift | grep -v private
+
+# Find all MatrixConfig references to understand constant usage
+grep -rn "MatrixConfig\." MatrixDigitalRain/*.swift
+
+# Find test patterns
+grep -n "func test" MatrixDigitalRainTests/*.swift
 ```
 
-## When No Code Exists
+## Documentation
 
-If starting a new project:
-
-1. Ask about preferred patterns
-2. Check package.json/config files for framework hints
-3. Use sensible defaults for detected stack
-4. Document decisions in `.claude/state/task.md`
-
-## Important
-
-- **Match existing patterns** - don't impose new ones
-- **When in doubt, check similar files** in the codebase
-- **Document as you discover** - note patterns in task state
-- **Ask if unclear** - better to ask than assume
+When documenting a discovered pattern, include:
+1. The file and line where the pattern is defined
+2. Example usage from the codebase
+3. Why the pattern exists (performance, correctness, framework requirement)
