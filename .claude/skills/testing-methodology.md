@@ -1,82 +1,120 @@
 ---
 name: testing-methodology
-description: Testing patterns and best practices for this project
-globs:
-  - "**/*.test.*"
-  - "**/*.spec.*"
-  - "**/test/**"
-  - "**/tests/**"
-  - "**/__tests__/**"
+description: AAA testing pattern with XCTest framework syntax
+globs: ["**/*Tests.swift"]
 ---
 
 # Testing Methodology
 
-## Testing Framework
+## Framework
 
-This project uses: **generic**
+This project uses **XCTest** with `@testable import MatrixDigitalRain`.
 
-## The AAA Pattern
+## Test File Conventions
 
-Structure every test with:
+- One test file per source file: `{ClassName}Tests.swift`
+- Class: `final class {Name}Tests: XCTestCase`
+- Methods: `func test{Behavior}()`
+- Organize with `// MARK: -` sections matching the source file's structure
 
-```
-Arrange - Set up test data and conditions
-Act     - Execute the code being tested
-Assert  - Verify the expected outcome
-```
+## AAA Pattern (Arrange, Act, Assert)
 
-## What to Test
+```swift
+func testBrightnessReturnsZeroForRowsOutsideTrail() {
+    // Arrange
+    let column = MatrixColumn(columnIndex: 0, numRows: 60)
 
-### Must Test
-- Core business logic
-- Edge cases and boundaries
-- Error handling paths
-- Public API contracts
+    // Act
+    let brightness = column.brightness(atRow: 200)
 
-### Consider Testing
-- Integration points
-- Complex conditional logic
-- State transitions
-
-### Skip Testing
-- Framework internals
-- Simple getters/setters
-- Configuration constants
-
-## Example Patterns
-
-
-```
-// Add examples for your testing framework here
-describe('Component', () => {
-  it('should behave correctly', () => {
-    // Arrange - set up test conditions
-    // Act - execute the code
-    // Assert - verify results
-  });
-});
+    // Assert
+    XCTAssertEqual(brightness, 0.0)
+}
 ```
 
-## Test Naming
+## Testing Patterns Found in This Codebase
 
+### Config validation (MatrixConfigTests.swift)
+Test that config values are within valid ranges:
+```swift
+func testPerCellMutationChanceIsValid() {
+    XCTAssertGreaterThanOrEqual(MatrixConfig.perCellMutationChance, 0)
+    XCTAssertLessThanOrEqual(MatrixConfig.perCellMutationChance, 1)
+}
 ```
-Format: [unit]_[scenario]_[expected result]
 
-Examples:
-- calculateTotal_withEmptyCart_returnsZero
-- userService_createUser_savesToDatabase
-- parseDate_invalidFormat_throwsError
+### Stateful objects with loop-based advancement (MatrixColumnTests.swift)
+Advance state in loops and check invariants:
+```swift
+func testUpdateDoesNotCrash() {
+    let column = MatrixColumn(columnIndex: 0, numRows: 60)
+    for _ in 0..<1000 { column.update() }
+}
 ```
 
-## Mocking Guidelines
+### Wall-clock timing tests (IntroSequenceTests.swift)
+Use deadlines for time-based state machines:
+```swift
+func testCompletesAfterEnoughTime() {
+    let intro = IntroSequence()
+    let deadline = Date().addingTimeInterval(60)
+    while !intro.isComplete && Date() < deadline {
+        intro.update()
+    }
+    XCTAssertTrue(intro.isComplete, "Intro should complete within 60s")
+}
+```
 
-1. **Mock external dependencies** - APIs, databases, file system
-2. **Don't mock what you own** - Prefer real implementations for your code
-3. **Keep mocks simple** - Complex mocks often indicate design issues
-4. **Reset mocks between tests** - Avoid state leakage
+### View smoke tests (MatrixDigitalRainViewTests.swift)
+Create views with `isPreview: true` and exercise lifecycle:
+```swift
+func testAnimateOneFrameDoesNotCrash() {
+    guard let view = MatrixDigitalRainView(
+        frame: NSRect(x: 0, y: 0, width: 1920, height: 1080),
+        isPreview: true
+    ) else {
+        XCTFail("Failed to create view")
+        return
+    }
+    view.startAnimation()
+    for _ in 0..<100 { view.animateOneFrame() }
+    view.stopAnimation()
+}
+```
 
-## Coverage Philosophy
+### Draw smoke tests (IntroSequenceTests.swift)
+Create a `CGContext` and call draw — success = no crash:
+```swift
+func testDrawDoesNotCrash() {
+    let intro = IntroSequence()
+    intro.update()
+    guard let ctx = CGContext(
+        data: nil, width: 320, height: 240,
+        bitsPerComponent: 8, bytesPerRow: 320 * 4,
+        space: CGColorSpaceCreateDeviceRGB(),
+        bitmapInfo: CGImageAlphaInfo.premultipliedFirst.rawValue
+    ) else {
+        XCTFail("Failed to create CGContext")
+        return
+    }
+    let bounds = NSRect(x: 0, y: 0, width: 320, height: 240)
+    intro.draw(in: ctx, bounds: bounds)
+}
+```
 
-- Aim for **80%+ coverage** on critical paths
-- Don't chase 100% - it often leads to brittle tests
-- Focus on **behavior coverage**, not line coverage
+## Running Tests
+
+```bash
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Debug \
+  -derivedDataPath build test
+```
+
+## Edge Cases to Cover
+
+- Zero/negative bounds for views and columns
+- Single-row columns (`numRows: 1`)
+- Extreme delta-time values (very small, very large)
+- Multiple reset cycles for stateful objects
+- All 57 characters in the Matrix character set
+- Boundary values for brightness (0.0, cutoff, threshold, 1.0)

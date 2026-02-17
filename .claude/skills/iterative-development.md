@@ -1,85 +1,63 @@
 ---
 name: iterative-development
-description: TDD-driven iterative loops until tests pass
-globs:
-  - "**/*.ts"
-  - "**/*.tsx"
-  - "**/*.js"
-  - "**/*.py"
-  - "**/*.go"
+description: TDD workflow with project-specific test and build commands
 ---
 
-# Iterative Development (TDD Loops)
+# Iterative Development
 
-Self-referential development loops where you iterate until completion criteria are met.
+## TDD Loop
 
-## Core Philosophy
+### 1. Write a failing test
+Add the test to the appropriate file in `MatrixDigitalRainTests/`:
+- Config tests → `MatrixConfigTests.swift`
+- Column tests → `MatrixColumnTests.swift`
+- Intro tests → `IntroSequenceTests.swift`
+- View tests → `MatrixDigitalRainViewTests.swift`
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  ITERATION > PERFECTION                                     │
-│  Don't aim for perfect on first try.                        │
-│  Let the loop refine the work.                              │
-├─────────────────────────────────────────────────────────────┤
-│  FAILURES ARE DATA                                          │
-│  Failed tests, lint errors, type mismatches are signals.    │
-│  Use them to guide the next iteration.                      │
-├─────────────────────────────────────────────────────────────┤
-│  CLEAR COMPLETION CRITERIA                                  │
-│  Define exactly what "done" looks like.                     │
-│  Tests passing. Coverage met. Lint clean.                   │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## TDD Workflow (Mandatory)
-
-Every implementation task MUST follow this workflow:
-
-### 1. RED: Write Tests First
+### 2. Run tests — confirm it fails
 ```bash
-# Write tests based on requirements
-# Run tests - they MUST FAIL
-npm test
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Debug \
+  -derivedDataPath build test
 ```
 
-### 2. GREEN: Implement Feature
+### 3. Write the minimal implementation
+- New constants go in `MatrixConfig.swift`
+- New column behavior goes in `MatrixColumn.swift`
+- New intro behavior goes in `IntroSequence.swift`
+- New rendering goes in `MatrixDigitalRainView.swift`
+
+### 4. Run tests — confirm it passes
 ```bash
-# Write minimum code to pass tests
-# Run tests - they MUST PASS
-npm test
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Debug \
+  -derivedDataPath build test
 ```
 
-### 3. VALIDATE: Quality Gates
+### 5. Build and visually verify
 ```bash
-# Full quality check
-npm test
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Release \
+  -derivedDataPath build build
+
+swift preview.swift --duration 20
 ```
 
-## Completion Criteria Template
+### 6. Refactor if needed
+- Move magic numbers to `MatrixConfig`
+- Extract methods if a function exceeds ~40 lines
+- Add `// MARK: -` sections for new code groups
+- Add `///` documentation comments
 
-For any implementation task, define:
+## Verification Checklist
 
-```markdown
-### Completion Criteria
-- [ ] All tests passing
-- [ ] Coverage >= 80% (on new code)
-- [ ] Lint clean (no errors)
-- [ ] Type check passing
-```
+Before considering a change complete:
 
-## When to Use This Workflow
-
-| Task Type | Use TDD Loop? |
-|-----------|---------------|
-| New feature | ✅ Always |
-| Bug fix | ✅ Always (write test that reproduces bug first) |
-| Refactoring | ✅ Always (existing tests must stay green) |
-| Spike/exploration | ❌ Skip (but document findings) |
-| Documentation | ❌ Skip |
-
-## Anti-Patterns
-
-- ❌ Writing code before tests
-- ❌ Skipping the RED phase (tests that never fail are useless)
-- ❌ Moving on when tests fail
-- ❌ Large batches (prefer small, focused iterations)
+- [ ] All existing tests pass
+- [ ] New tests added for new behavior
+- [ ] Constants are in `MatrixConfig`, not hardcoded
+- [ ] Code uses `// MARK: -` sections
+- [ ] Public API has `///` doc comments
+- [ ] No per-frame allocations in draw/update loops
+- [ ] Timing uses `Date()` or delta-time, not frame counts
+- [ ] Visual preview looks correct (`swift preview.swift`)

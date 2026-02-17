@@ -1,36 +1,58 @@
 ---
-allowed-tools: Read, Glob, Grep
-argument-hint: [area to analyze]
-description: Deep analysis of a specific area
+allowed-tools: ["Read", "Glob", "Grep"]
+description: "Deep analysis of a specific area"
+argument-hint: "<area or file path>"
 ---
 
-# Analyze: $ARGUMENTS
+# Analyze
 
-## Analysis Scope
+Perform a thorough analysis of the specified area of the codebase.
 
-Perform deep analysis of: **$ARGUMENTS**
+1. **Identify the scope**: Determine what the argument refers to:
+   - A file path → analyze that specific file
+   - A feature name (e.g., "intro", "rain", "columns") → analyze the relevant files
+   - A concept (e.g., "timing", "rendering", "font") → trace it across all files
 
-## Process
+2. **Read all relevant files**: For the identified scope, read:
+   - Source file(s) in `MatrixDigitalRain/`
+   - Corresponding test file(s) in `MatrixDigitalRainTests/`
+   - Related config entries in `MatrixConfig.swift`
 
-1. **Locate relevant files** using Glob and Grep
-2. **Read and understand** the code structure
-3. **Identify patterns** and conventions
-4. **Document findings** with file:line references
+3. **Trace data flow**: Follow how data moves through the system:
+   - Where is it created/initialized?
+   - Where is it updated?
+   - Where is it consumed/rendered?
 
-## Output Format
+4. **Identify patterns**: Document:
+   - Design patterns used
+   - Constants and their relationships
+   - State transitions (for state machines)
+   - Performance considerations
 
-### Overview
-Brief description of what this area does.
+5. **Output a structured report**:
 
-### Key Files
-- `path/to/file.ts:10` - Purpose
+```
+## Analysis: {area}
 
-### Patterns Found
-- Pattern 1: Description
-- Pattern 2: Description
+### Files Involved
+| File | Role |
+|------|------|
+| ... | ... |
+
+### How It Works
+{step-by-step explanation of the mechanism}
+
+### Key Constants
+| Constant | Value | Purpose |
+|----------|-------|---------|
+| ... | ... | ... |
 
 ### Dependencies
-What this area depends on and what depends on it.
+{what this area depends on, and what depends on it}
 
-### Recommendations
-Any improvements or concerns noted.
+### Potential Improvements
+{any observations about possible enhancements, if relevant}
+
+### Test Coverage
+{what's tested, what's not}
+```
