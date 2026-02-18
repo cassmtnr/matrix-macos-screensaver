@@ -1,29 +1,48 @@
 ---
-allowed-tools: Read, Write, Edit, Glob, Bash(git diff), Bash(git status)
-description: Mark current task complete
+allowed-tools: ["Read", "Write", "Edit", "Glob", "Grep", "Bash(git:*)", "Bash(xcodebuild -project MatrixDigitalRain.xcodeproj -scheme MatrixDigitalRain -configuration Debug -derivedDataPath build test)", "Bash(xcodebuild -project MatrixDigitalRain.xcodeproj -scheme MatrixDigitalRain -configuration Release -derivedDataPath build build)"]
+description: "Mark current task complete"
 ---
 
-# Complete Task
+# Done
 
-## Current State
-!cat .claude/state/task.md
+Mark the current task as complete after verification.
 
-## Completion Checklist
+1. **Run tests**:
+   ```bash
+   xcodebuild -project MatrixDigitalRain.xcodeproj \
+     -scheme MatrixDigitalRain -configuration Debug \
+     -derivedDataPath build test
+   ```
 
-Before marking complete, verify:
+2. **Build**:
+   ```bash
+   xcodebuild -project MatrixDigitalRain.xcodeproj \
+     -scheme MatrixDigitalRain -configuration Release \
+     -derivedDataPath build build
+   ```
 
-1. [ ] All requirements met
-2. [ ] Tests pass (if applicable)
-3. [ ] No linting errors
-4. [ ] Code reviewed for quality
+3. If tests and build pass:
+   - Read `.claude/state/task.md`
+   - Update the task status to "Done" with a completion timestamp
+   - Add a summary of what was accomplished
 
-## Your Task
+4. If tests or build fail:
+   - Report the failure
+   - Do NOT mark the task as done
+   - Suggest what needs to be fixed
 
-1. Run final checks (tests, lint)
-2. Update `.claude/state/task.md`:
-   - Status: **Completed**
-   - Summary of what was done
-   - Files changed
-   - Any follow-up items
+5. Show a summary:
+   ```
+   ## Task Complete
+   {task description}
 
-3. Show git status/diff for review
+   ## What Was Done
+   {bullet list of changes}
+
+   ## Verification
+   - Tests: ✅ Passed / ❌ Failed
+   - Build: ✅ Passed / ❌ Failed
+
+   ## Suggested Next Steps
+   {any follow-up items}
+   ```

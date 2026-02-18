@@ -1,93 +1,67 @@
 ---
 name: commit-hygiene
-description: Atomic commits, PR size limits, commit thresholds
-globs:
-  - "**/*"
+description: Atomic commits, conventional format, size thresholds
 ---
 
 # Commit Hygiene
 
-Keep commits atomic, PRs reviewable, and git history clean.
+## Conventional Commit Format
+
+This project uses conventional commits:
+
+```
+<type>: <description>
+
+[optional body]
+```
+
+### Types
+- `feat:` — New feature or behavior
+- `fix:` — Bug fix
+- `refactor:` — Code change that neither fixes a bug nor adds a feature
+- `perf:` — Performance improvement
+- `test:` — Adding or updating tests
+- `chore:` — Build process, CI, documentation, dependencies
+- `docs:` — Documentation-only changes
+
+### Examples from this project
+```
+feat: Add Matrix Digital Rain screensaver and related documentation
+chore: update preview GIF [skip ci]
+```
 
 ## Size Thresholds
 
-| Metric | 🟢 Good | 🟡 Warning | 🔴 Commit Now |
-|--------|---------|------------|---------------|
-| Files changed | 1-5 | 6-10 | > 10 |
-| Lines added | < 150 | 150-300 | > 300 |
-| Total changes | < 250 | 250-400 | > 400 |
-
-**Research shows:** PRs > 400 lines have 40%+ defect rates vs 15% for smaller changes.
+- **Target**: ±300 lines per commit
+- **Maximum**: ±500 lines — split into multiple commits if larger
+- **Exceptions**: Initial scaffolding, large refactors with approval
 
 ## When to Commit
 
-### Commit Triggers (Any = Commit)
+Commit after each of these triggers:
+1. A new feature or behavior is working and tested
+2. A bug is fixed and verified with a test
+3. A refactor is complete and tests still pass
+4. Config values are tuned and the visual result is verified
 
-| Trigger | Action |
-|---------|--------|
-| Test passes | Just got a test green → commit |
-| Feature complete | Finished a function → commit |
-| Refactor done | Renamed across files → commit |
-| Bug fixed | Fixed the issue → commit |
-| Threshold hit | > 5 files or > 200 lines → commit |
+## Atomic Commit Rules
 
-### Commit Immediately If
+1. Each commit should be independently buildable and testable
+2. Don't mix feature work with refactoring in the same commit
+3. Don't mix source changes with unrelated config/CI changes
+4. Test files can be in the same commit as the code they test
 
-- ✅ Tests are passing after being red
-- ✅ You're about to make a "big change"
-- ✅ You've been coding for 30+ minutes
-- ✅ You're about to try something risky
-- ✅ The current state is "working"
+## Pre-Commit Verification
 
-## Atomic Commit Patterns
-
-### Good Commits ✅
-
-```
-"Add email validation to signup form"
-- 3 files: validator.ts, signup.tsx, signup.test.ts
-- 120 lines changed
-- Single purpose: email validation
-
-"Fix null pointer in user lookup"
-- 2 files: userService.ts, userService.test.ts
-- 25 lines changed
-- Single purpose: fix one bug
-```
-
-### Bad Commits ❌
-
-```
-"Add authentication, fix bugs, update styles"
-- 25 files changed, 800 lines
-- Multiple unrelated purposes
-
-"WIP" / "Updates" / "Fix stuff"
-- Unknown scope, no clear purpose
-```
-
-## Quick Status Check
-
-Run frequently to check current state:
-
+Before committing, verify:
 ```bash
-# See what's changed
-git status --short
+# Tests pass
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Debug \
+  -derivedDataPath build test
 
-# Count changes
-git diff --shortstat
-
-# Full summary
-git diff --stat HEAD
+# Build succeeds
+xcodebuild -project MatrixDigitalRain.xcodeproj \
+  -scheme MatrixDigitalRain -configuration Release \
+  -derivedDataPath build build
 ```
-
-## PR Size Rules
-
-| PR Size | Review Time | Quality |
-|---------|-------------|---------|
-| < 200 lines | < 30 min | High confidence |
-| 200-400 lines | 30-60 min | Good confidence |
-| 400-1000 lines | 1-2 hours | Declining quality |
-| > 1000 lines | Often skipped | Rubber-stamped |
-
-**Best practice:** If a PR will be > 400 lines, split into stacked PRs.

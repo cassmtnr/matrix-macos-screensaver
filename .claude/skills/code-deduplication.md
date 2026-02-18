@@ -1,102 +1,54 @@
 ---
 name: code-deduplication
-description: Prevent semantic code duplication with capability index
-globs:
-  - "**/*.ts"
-  - "**/*.tsx"
-  - "**/*.js"
-  - "**/*.py"
+description: Check-before-write principle and search checklist
 ---
 
 # Code Deduplication
 
-Prevent semantic duplication by maintaining awareness of existing capabilities.
+## Check-Before-Write Principle
 
-## Core Principle
+Before writing any new code, search the existing codebase to see if the functionality already exists.
 
+## Search Checklist
+
+### 1. Search source files for existing implementations
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│  CHECK BEFORE YOU WRITE                                         │
-│  ─────────────────────────────────────────────────────────────  │
-│  AI doesn't copy/paste - it reimplements.                       │
-│  The problem isn't duplicate code, it's duplicate PURPOSE.      │
-│                                                                 │
-│  Before writing ANY new function:                               │
-│  1. Search codebase for similar functionality                   │
-│  2. Check utils/, helpers/, lib/ for existing implementations   │
-│  3. Extend existing code if possible                            │
-│  4. Only create new if nothing suitable exists                  │
-└─────────────────────────────────────────────────────────────────┘
+# Search all Swift source files
+grep -rn "keyword" MatrixDigitalRain/*.swift
+
+# Search for a specific function or type
+grep -rn "func methodName\|class TypeName" MatrixDigitalRain/*.swift
 ```
 
-## Before Writing New Code
+### 2. Check MatrixConfig for existing constants
+```
+grep -n "static let\|static func\|static var" MatrixDigitalRain/MatrixConfig.swift
+```
+All tunable constants live in `MatrixConfig`. Before adding a new constant, verify it doesn't already exist under a different name.
 
-### Search Checklist
-
-1. **Search by purpose**: "format date", "validate email", "fetch user"
-2. **Search common locations**:
-   - `src/utils/` or `lib/`
-   - `src/helpers/`
-   - `src/common/`
-   - `src/shared/`
-3. **Search by function signature**: Similar inputs/outputs
-
-### Common Duplicate Candidates
-
-| Category | Look For |
-|----------|----------|
-| Date/Time | formatDate, parseDate, isExpired, addDays |
-| Validation | isEmail, isPhone, isURL, isUUID |
-| Strings | slugify, truncate, capitalize, pluralize |
-| API | fetchUser, createItem, handleError |
-| Auth | validateToken, requireAuth, getCurrentUser |
-
-## If Similar Code Exists
-
-### Option 1: Reuse directly
-```typescript
-// Import and use existing function
-import { formatDate } from '@/utils/dates';
+### 3. Check test files for prior coverage
+```
+grep -rn "func test" MatrixDigitalRainTests/*.swift
 ```
 
-### Option 2: Extend with options
-```typescript
-// Add optional parameter to existing function
-export function formatDate(
-  date: Date,
-  format: string = 'short',
-  locale?: string  // NEW: added locale support
-): string { ... }
+### 4. Check scripts for utility code
+```
+grep -rn "keyword" preview.swift generate_preview.swift
 ```
 
-### Option 3: Compose from existing
-```typescript
-// Build on existing utilities
-export function formatDateRange(start: Date, end: Date) {
-  return `${formatDate(start)} - ${formatDate(end)}`;
-}
-```
+## Where to Put New Code
 
-## File Header Pattern
+| What | Where |
+|------|-------|
+| New constant | `MatrixDigitalRain/MatrixConfig.swift` — add to appropriate `// MARK:` section |
+| New column behavior | `MatrixDigitalRain/MatrixColumn.swift` — new method or modify `update()` |
+| New intro behavior | `MatrixDigitalRain/IntroSequence.swift` — new phase or modify state machine |
+| New rendering | `MatrixDigitalRain/MatrixDigitalRainView.swift` — new draw method |
+| New test | `MatrixDigitalRainTests/{ClassName}Tests.swift` |
 
-Document what each file provides:
+## Common Duplication Risks
 
-```typescript
-/**
- * @file User validation utilities
- * @description Email, phone, and identity validation functions.
- *
- * Key exports:
- * - isEmail(email) - Validates email format
- * - isPhone(phone, country?) - Validates phone with country
- * - isValidUsername(username) - Checks username rules
- */
-```
-
-## Anti-Patterns
-
-- ❌ Writing date formatter without checking utils/
-- ❌ Creating new API client when one exists
-- ❌ Duplicating validation logic across files
-- ❌ Copy-pasting functions between files
-- ❌ "I'll refactor later" (you won't)
+- **Scanline drawing** — Both `IntroSequence.drawScanlines()` and `MatrixDigitalRainView.drawScanlines()` draw scanlines independently. This is intentional — the intro and rain have different rendering contexts.
+- **Color creation** — Colors should use the pre-computed `greenPalette` (256 entries). Don't create new `CGColor` objects per-frame.
+- **Random character generation** — Always use `MatrixConfig.randomChar()`. Don't create your own random character logic.
+- **Font loading** — Use the cached `ctFont` property. Don't call `NSFont(name:size:)` or `CTFontCreateWithName` outside of initialization.

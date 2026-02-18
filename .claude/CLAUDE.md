@@ -69,7 +69,7 @@ matrix-savescreen/
 | Framework | ScreenSaver (AppKit) | Subclass of `ScreenSaverView`; `animateOneFrame()` driven by framework |
 | Rendering | Core Graphics + CoreText | Direct `CGContext` drawing; `CTFontDrawGlyphs` for fast glyph rendering |
 | Font | Matrix-Code.ttf | Custom 57-glyph font registered at runtime via `CTFontManagerRegisterFontsForURL` |
-| Build System | Xcode 15 / xcodebuild | `.xcodeproj` with two targets: bundle + unit tests |
+| Build System | Xcode / xcodebuild | `.xcodeproj` with two targets: bundle + unit tests |
 | Testing | XCTest | Unit tests for config, column, intro, and view |
 | CI/CD | GitHub Actions | `ci.yml` (develop/PR) and `release.yml` (main) |
 | Deployment Target | macOS 11.0+ | Set in Xcode project build settings |
@@ -87,9 +87,6 @@ matrix-savescreen/
 ### Getting Started
 
 ```bash
-git clone https://github.com/cassmtnr/matrix-macos-screensaver.git
-cd matrix-macos-screensaver
-
 # Build the screensaver bundle
 xcodebuild -project MatrixDigitalRain.xcodeproj \
   -scheme MatrixDigitalRain \
@@ -148,11 +145,11 @@ open build/Build/Products/Release/MatrixDigitalRain.saver
 
 ### Patterns to Follow
 
-- **Constants as caseless enum namespace** — All tunable values live in `MatrixConfig` as static properties. Never scatter magic numbers in other files. See `MatrixConfig.swift:8` for the pattern.
+- **Constants as caseless enum namespace** — All tunable values live in `MatrixConfig` as static properties. Never scatter magic numbers in other files. See `MatrixConfig.swift:8`.
 - **`// MARK: -` sections** — Every file organizes code with MARK comments: Properties, Initialization, Update, Draw, etc. See `MatrixColumn.swift:12` and `MatrixDigitalRainView.swift:19`.
 - **Wall-clock timing for intro, delta-time for rain** — The intro uses `Date()` for consistent real-world speed. The rain uses elapsed-time deltas passed to `update(deltaTime:)`. See `IntroSequence.swift:57` and `MatrixColumn.swift:43`.
 - **Pre-computed resources** — Font glyphs are cached at init (`buildGlyphCache()`), colors are pre-computed into a 256-entry palette (`buildGreenPalette()`). Never allocate per-frame. See `MatrixDigitalRainView.swift:86-104`.
-- **JSDoc-style `///` comments** — All public types and methods have `///` documentation comments explaining purpose and behavior. See any source file.
+- **`///` documentation comments** — All public types and methods have `///` documentation comments explaining purpose and behavior.
 
 ### Anti-Patterns to Avoid
 

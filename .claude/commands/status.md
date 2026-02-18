@@ -1,20 +1,26 @@
 ---
-allowed-tools: Read, Glob
-description: Show current task and session state
+allowed-tools: ["Read", "Glob", "Grep", "Bash(git status)", "Bash(git diff --stat)"]
+description: "Show current task and session state"
 ---
 
-# Status Check
+# Status
 
-## Current Task State
-!cat .claude/state/task.md 2>/dev/null || echo "No task in progress"
+Show the current state of the project and any active task.
 
-## Your Response
+1. Read `.claude/state/task.md` and display the current task (if any)
+2. Run `git status` to show the working tree state
+3. Run `git diff --stat` to show a summary of changes
+4. List recently modified Swift files:
+   - Search `MatrixDigitalRain/*.swift` and `MatrixDigitalRainTests/*.swift`
+5. Summarize the current state in a concise format:
 
-Provide a concise status update:
+```
+## Current Task
+{task description and status, or "No active task"}
 
-1. **Current Task**: What are you working on?
-2. **Progress**: What's been completed?
-3. **Blockers**: Any issues or questions?
-4. **Next Steps**: What's coming up?
+## Git Status
+{branch, staged/unstaged changes}
 
-Keep it brief - this is a quick check-in.
+## Changed Files
+{list of modified files with brief description of changes}
+```
