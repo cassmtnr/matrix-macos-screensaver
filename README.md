@@ -1,6 +1,5 @@
 # Matrix Digital Rain Screensaver
 
-[![CI](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS_11+-blue.svg)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
@@ -66,9 +65,9 @@ swift generate_preview.swift --help
 
 ### Releasing
 
-Distribution builds are signed with a Developer ID Application certificate and notarized so users don't see Gatekeeper warnings. The CI workflow (`release.yml`) creates a *draft* GitHub Release on every push to `main` with the next version tag; the signed zip is produced locally and uploaded to finish publishing.
+Distribution builds are signed with a Developer ID Application certificate and notarized so users don't see Gatekeeper warnings. Everything is driven from your local Mac.
 
-One-time setup on the release machine:
+One-time setup:
 
 ```bash
 # Store an App Store Connect API key for notarytool
@@ -78,18 +77,21 @@ xcrun notarytool store-credentials "matrix-notary" \
   --issuer <ISSUER_ID>
 ```
 
-Per release, after merging to `main` and CI creating the draft release:
+Per release:
 
 ```bash
-# Build, sign, notarize, staple, and zip
+# Build, sign, notarize, staple, zip
 ./scripts/sign-and-notarize.sh
 
-# Attach the signed zip to the draft release and publish it
-gh release upload v<X.Y.Z> MatrixDigitalRain.saver.zip
-gh release edit v<X.Y.Z> --draft=false
+# Publish (pick the next tag yourself — see latest with: git tag -l 'v*' | sort -V | tail -1)
+gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes
 ```
 
-The tag name is printed at the end of the CI run.
+To also refresh the preview GIF for the Pages site:
+
+```bash
+swift generate_preview.swift --output docs/matrix_preview.gif
+```
 
 ### Project Structure
 
