@@ -24,14 +24,10 @@ A Matrix-style screensaver for macOS with a personalized intro sequence and real
 ### Download
 
 1. Download `MatrixDigitalRain.saver.zip` from [Releases](https://github.com/cassmtnr/matrix-macos-screensaver/releases/latest)
-2. Unzip and remove quarantine (quarantine is applied as it's not a signed app):
-   ```bash
-   xattr -cr ~/Downloads/MatrixDigitalRain.saver
-   ```
-3. Double-click `MatrixDigitalRain.saver` to install
-4. Select it in **System Settings > Screen Saver**
+2. Unzip and double-click `MatrixDigitalRain.saver` to install
+3. Select it in **System Settings > Screen Saver**
 
-### Build from Source (no quarantine applied as you're the developer)
+### Build from Source
 
 ```bash
 git clone https://github.com/cassmtnr/matrix-macos-screensaver.git
@@ -67,6 +63,33 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
 # Generate preview GIF (requires ffmpeg)
 swift generate_preview.swift --help
 ```
+
+### Releasing
+
+Distribution builds are signed with a Developer ID Application certificate and notarized so users don't see Gatekeeper warnings. The CI workflow (`release.yml`) creates a *draft* GitHub Release on every push to `main` with the next version tag; the signed zip is produced locally and uploaded to finish publishing.
+
+One-time setup on the release machine:
+
+```bash
+# Store an App Store Connect API key for notarytool
+xcrun notarytool store-credentials "matrix-notary" \
+  --key ~/path/to/AuthKey_XXXXXXXX.p8 \
+  --key-id <KEY_ID> \
+  --issuer <ISSUER_ID>
+```
+
+Per release, after merging to `main` and CI creating the draft release:
+
+```bash
+# Build, sign, notarize, staple, and zip
+./scripts/sign-and-notarize.sh
+
+# Attach the signed zip to the draft release and publish it
+gh release upload v<X.Y.Z> MatrixDigitalRain.saver.zip
+gh release edit v<X.Y.Z> --draft=false
+```
+
+The tag name is printed at the end of the CI run.
 
 ### Project Structure
 

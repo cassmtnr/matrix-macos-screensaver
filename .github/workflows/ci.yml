@@ -22,6 +22,8 @@ jobs:
             -scheme MatrixDigitalRain \
             -configuration Release \
             -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             build
 
       - name: Run Tests
@@ -30,6 +32,8 @@ jobs:
             -scheme MatrixDigitalRain \
             -configuration Debug \
             -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
             test
 
       - name: Package artifact

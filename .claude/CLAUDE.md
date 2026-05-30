@@ -189,7 +189,7 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
 
 ## Gotchas & Important Notes
 
-1. **The `.saver` bundle is not code-signed** — Users must run `xattr -cr` to remove quarantine after downloading from GitHub Releases. Building from source avoids this.
+1. **Releases are signed and notarized locally, not in CI** — Pushing to `main` triggers `release.yml`, which builds + tests, bumps the version, and creates a *draft* GitHub Release with no binary attached. The signed bundle is produced locally by running `scripts/sign-and-notarize.sh` on a Mac with the Developer ID Application cert (team `58N4UVGANT`) and the `matrix-notary` notarytool keychain profile set up. The script signs with hardened runtime + secure timestamp, notarizes via Apple's notary service, staples the ticket, and writes `MatrixDigitalRain.saver.zip` for upload to the draft release via `gh release upload`. The release is then flipped to published with `gh release edit --draft=false`. Debug builds keep using automatic Apple Development signing.
 2. **`@objc(MatrixDigitalRainView)` is required** — The ScreenSaver framework loads the principal class by name from `Info.plist`. The `@objc` annotation ensures the class is visible to Objective-C runtime with the exact name `MatrixDigitalRainView` (no module prefix).
 3. **Font registration is process-scoped** — `CTFontManagerRegisterFontsForURL` with `.process` scope means the Matrix-Code font is only available within the screensaver process. It's guarded by a static `fontRegistered` flag to register only once.
 4. **`preview.swift` requires a built bundle** — It loads `build/Build/Products/Release/MatrixDigitalRain.saver` at runtime. You must build first with xcodebuild.

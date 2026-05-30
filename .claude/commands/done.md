@@ -40,8 +40,8 @@ Mark the current task as complete after verification.
    {bullet list of changes}
 
    ## Verification
-   - Tests: ✅ Passed / ❌ Failed
-   - Build: ✅ Passed / ❌ Failed
+   - Tests: Passed / Failed
+   - Build: Passed / Failed
 
    ## Suggested Next Steps
    {any follow-up items}
