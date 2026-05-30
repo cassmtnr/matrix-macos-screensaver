@@ -37,6 +37,7 @@ matrix-savescreen/
 ├── generate_preview.swift              # Headless GIF generator (requires ffmpeg)
 ├── scripts/
 │   └── sign-and-notarize.sh            # Local signing + notarization for releases
+├── RELEASING.md                        # Full release process documentation
 └── .claude/                            # Claude Code configuration
 ```
 
@@ -182,12 +183,12 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
 
 - **`develop` branch** — Active development
 - **`main` branch** — Stable code that has been released
-- **Release process** — Fully manual. Run `./scripts/sign-and-notarize.sh` on a Mac with the Developer ID Application cert + `matrix-notary` notarytool profile, then `gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes`. Bump the version yourself (`git tag -l 'v*' | sort -V | tail -1` shows the latest). Preview GIF regeneration is also manual: `swift generate_preview.swift --output docs/matrix_preview.gif`.
+- **Release process** — Fully manual; full step-by-step in [`RELEASING.md`](../RELEASING.md). Short version: `./scripts/sign-and-notarize.sh` then `gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes`. Preview GIF regeneration is also manual: `swift generate_preview.swift --output docs/matrix_preview.gif`.
 - **Conventional commits** — Use `feat:`, `fix:`, `chore:`, etc. prefixes
 
 ## Gotchas & Important Notes
 
-1. **Releases are signed, notarized, and published entirely from a local Mac** — There is no CI. Run `scripts/sign-and-notarize.sh` (needs the Developer ID Application cert for team `58N4UVGANT` and the `matrix-notary` notarytool keychain profile). It signs with hardened runtime + secure timestamp, notarizes via Apple's notary service, staples the ticket, and writes `MatrixDigitalRain.saver.zip` at the repo root. Publish with `gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes`. Debug builds keep using automatic Apple Development signing.
+1. **Releases are signed, notarized, and published entirely from a local Mac** — There is no CI. Full procedure (prerequisites, step-by-step, troubleshooting, how the pieces fit together) lives in `RELEASING.md` at the repo root. Short version: `scripts/sign-and-notarize.sh` produces `MatrixDigitalRain.saver.zip`; `gh release create` publishes it. Debug builds keep using automatic Apple Development signing.
 2. **`@objc(MatrixDigitalRainView)` is required** — The ScreenSaver framework loads the principal class by name from `Info.plist`. The `@objc` annotation ensures the class is visible to Objective-C runtime with the exact name `MatrixDigitalRainView` (no module prefix).
 3. **Font registration is process-scoped** — `CTFontManagerRegisterFontsForURL` with `.process` scope means the Matrix-Code font is only available within the screensaver process. It's guarded by a static `fontRegistered` flag to register only once.
 4. **`preview.swift` requires a built bundle** — It loads `build/Build/Products/Release/MatrixDigitalRain.saver` at runtime. You must build first with xcodebuild.

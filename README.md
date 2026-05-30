@@ -65,33 +65,14 @@ swift generate_preview.swift --help
 
 ### Releasing
 
-Distribution builds are signed with a Developer ID Application certificate and notarized so users don't see Gatekeeper warnings. Everything is driven from your local Mac.
-
-One-time setup:
+Releases are signed with a Developer ID Application certificate, notarized, and published manually from a local Mac. The short version:
 
 ```bash
-# Store an App Store Connect API key for notarytool
-xcrun notarytool store-credentials "matrix-notary" \
-  --key ~/path/to/AuthKey_XXXXXXXX.p8 \
-  --key-id <KEY_ID> \
-  --issuer <ISSUER_ID>
-```
-
-Per release:
-
-```bash
-# Build, sign, notarize, staple, zip
 ./scripts/sign-and-notarize.sh
-
-# Publish (pick the next tag yourself — see latest with: git tag -l 'v*' | sort -V | tail -1)
 gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes
 ```
 
-To also refresh the preview GIF for the Pages site:
-
-```bash
-swift generate_preview.swift --output docs/matrix_preview.gif
-```
+See [`RELEASING.md`](RELEASING.md) for prerequisites (Developer ID cert, App Store Connect API key, notarytool keychain profile), step-by-step instructions, verification, and troubleshooting.
 
 ### Project Structure
 
