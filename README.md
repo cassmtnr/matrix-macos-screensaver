@@ -1,6 +1,5 @@
 # Matrix Digital Rain Screensaver
 
-[![CI](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml/badge.svg)](https://github.com/cassmtnr/matrix-macos-screensaver/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform: macOS](https://img.shields.io/badge/Platform-macOS_11+-blue.svg)](https://www.apple.com/macos/)
 [![Swift](https://img.shields.io/badge/Swift-5.0-orange.svg)](https://swift.org)
@@ -66,30 +65,14 @@ swift generate_preview.swift --help
 
 ### Releasing
 
-Distribution builds are signed with a Developer ID Application certificate and notarized so users don't see Gatekeeper warnings. The CI workflow (`release.yml`) creates a *draft* GitHub Release on every push to `main` with the next version tag; the signed zip is produced locally and uploaded to finish publishing.
-
-One-time setup on the release machine:
+Releases are signed with a Developer ID Application certificate, notarized, and published manually from a local Mac. The short version:
 
 ```bash
-# Store an App Store Connect API key for notarytool
-xcrun notarytool store-credentials "matrix-notary" \
-  --key ~/path/to/AuthKey_XXXXXXXX.p8 \
-  --key-id <KEY_ID> \
-  --issuer <ISSUER_ID>
-```
-
-Per release, after merging to `main` and CI creating the draft release:
-
-```bash
-# Build, sign, notarize, staple, and zip
 ./scripts/sign-and-notarize.sh
-
-# Attach the signed zip to the draft release and publish it
-gh release upload v<X.Y.Z> MatrixDigitalRain.saver.zip
-gh release edit v<X.Y.Z> --draft=false
+gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes
 ```
 
-The tag name is printed at the end of the CI run.
+See [`RELEASING.md`](RELEASING.md) for prerequisites (Developer ID cert, App Store Connect API key, notarytool keychain profile), step-by-step instructions, verification, and troubleshooting.
 
 ### Project Structure
 

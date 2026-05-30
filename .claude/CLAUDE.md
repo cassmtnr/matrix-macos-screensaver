@@ -35,9 +35,9 @@ matrix-savescreen/
 ├── docs/                               # GitHub Pages site + preview GIF
 ├── preview.swift                       # Standalone preview runner (Cmd+Q to quit)
 ├── generate_preview.swift              # Headless GIF generator (requires ffmpeg)
-├── .github/workflows/
-│   ├── ci.yml                          # Build + test on push to develop / PR to main
-│   └── release.yml                     # Build + test + release + GIF gen on push to main
+├── scripts/
+│   └── sign-and-notarize.sh            # Local signing + notarization for releases
+├── RELEASING.md                        # Full release process documentation
 └── .claude/                            # Claude Code configuration
 ```
 
@@ -71,7 +71,6 @@ matrix-savescreen/
 | Font | Matrix-Code.ttf | Custom 57-glyph font registered at runtime via `CTFontManagerRegisterFontsForURL` |
 | Build System | Xcode / xcodebuild | `.xcodeproj` with two targets: bundle + unit tests |
 | Testing | XCTest | Unit tests for config, column, intro, and view |
-| CI/CD | GitHub Actions | `ci.yml` (develop/PR) and `release.yml` (main) |
 | Deployment Target | macOS 11.0+ | Set in Xcode project build settings |
 | Bundle ID | `com.cassmtnr.matrixdigitalrain` | Produces `MatrixDigitalRain.saver` |
 | License | MIT | |
@@ -182,14 +181,14 @@ xcodebuild -project MatrixDigitalRain.xcodeproj \
 
 ## Git Workflow
 
-- **`develop` branch** — Active development; CI runs on push
-- **`main` branch** — Stable releases; CI runs on PR, release workflow runs on push
-- **Release process** — Pushing to `main` triggers automatic version bump (patch), GitHub Release creation with `.saver.zip`, and preview GIF regeneration
+- **`develop` branch** — Active development
+- **`main` branch** — Stable code that has been released
+- **Release process** — Fully manual; full step-by-step in [`RELEASING.md`](../RELEASING.md). Short version: `./scripts/sign-and-notarize.sh` then `gh release create vX.Y.Z MatrixDigitalRain.saver.zip --generate-notes`. Preview GIF regeneration is also manual: `swift generate_preview.swift --output docs/matrix_preview.gif`.
 - **Conventional commits** — Use `feat:`, `fix:`, `chore:`, etc. prefixes
 
 ## Gotchas & Important Notes
 
-1. **Releases are signed and notarized locally, not in CI** — Pushing to `main` triggers `release.yml`, which builds + tests, bumps the version, and creates a *draft* GitHub Release with no binary attached. The signed bundle is produced locally by running `scripts/sign-and-notarize.sh` on a Mac with the Developer ID Application cert (team `58N4UVGANT`) and the `matrix-notary` notarytool keychain profile set up. The script signs with hardened runtime + secure timestamp, notarizes via Apple's notary service, staples the ticket, and writes `MatrixDigitalRain.saver.zip` for upload to the draft release via `gh release upload`. The release is then flipped to published with `gh release edit --draft=false`. Debug builds keep using automatic Apple Development signing.
+1. **Releases are signed, notarized, and published entirely from a local Mac** — There is no CI. Full procedure (prerequisites, step-by-step, troubleshooting, how the pieces fit together) lives in `RELEASING.md` at the repo root. Short version: `scripts/sign-and-notarize.sh` produces `MatrixDigitalRain.saver.zip`; `gh release create` publishes it. Debug builds keep using automatic Apple Development signing.
 2. **`@objc(MatrixDigitalRainView)` is required** — The ScreenSaver framework loads the principal class by name from `Info.plist`. The `@objc` annotation ensures the class is visible to Objective-C runtime with the exact name `MatrixDigitalRainView` (no module prefix).
 3. **Font registration is process-scoped** — `CTFontManagerRegisterFontsForURL` with `.process` scope means the Matrix-Code font is only available within the screensaver process. It's guarded by a static `fontRegistered` flag to register only once.
 4. **`preview.swift` requires a built bundle** — It loads `build/Build/Products/Release/MatrixDigitalRain.saver` at runtime. You must build first with xcodebuild.
