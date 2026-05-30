@@ -12,6 +12,7 @@ xcuserdata/
 
 # Built screensaver bundles (tracked separately in releases)
 *.saver
+*.saver.zip
 
 # IDE
 .idea/

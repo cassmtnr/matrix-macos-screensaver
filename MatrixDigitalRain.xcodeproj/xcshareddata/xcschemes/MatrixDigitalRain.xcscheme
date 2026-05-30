@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A10000000000000000000040"
-               BuildableName = "Matrix Digital Rain.saver"
+               BuildableName = "MatrixDigitalRain.saver"
                BlueprintName = "MatrixDigitalRain"
                ReferencedContainer = "container:MatrixDigitalRain.xcodeproj">
             </BuildableReference>

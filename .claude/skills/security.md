@@ -39,7 +39,7 @@ The screensaver makes no network calls. It reads only:
 The screensaver does not write to disk, store preferences, or access the keychain. `hasConfigureSheet` returns `false`.
 
 ### Code signing
-The `.saver` bundle is **not code-signed**. Users must remove quarantine with `xattr -cr` after downloading. If code signing is added in the future:
+The `.saver` bundle is **code-signed** with a Developer ID certificate.
 - Never commit signing certificates or provisioning profiles
 - Use Xcode automatic signing or CI-provided credentials
 - Add `*.p12`, `*.mobileprovision`, `*.certSigningRequest` to `.gitignore`
@@ -47,7 +47,7 @@ The `.saver` bundle is **not code-signed**. Users must remove quarantine with `x
 ## OWASP Relevance
 
 Most OWASP Top 10 categories don't apply (no web server, no database, no user input). The primary concern is:
-- **A08: Software and Data Integrity** — The unsigned bundle is a trust concern. Users should verify the download hash or build from source.
+- **A08: Software and Data Integrity** — The bundle is code-signed with a Developer ID certificate, ensuring integrity and authenticity.
 
 ## Pre-Commit Checks
 
